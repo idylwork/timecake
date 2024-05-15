@@ -1,0 +1,25 @@
+.item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.name {
+    flex-grow: 1;
+    font-size: 0.8rem;
+    border: 0.9px solid #cccccc;
+    border-radius: 0.2rem;
+
+    &:disabled {
+        border-color:  transparent;
+    }
+}
+
+.append {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    width: 100%;
+    font-size: 0.8rem;
+}

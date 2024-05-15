@@ -1,0 +1,21 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    height: 100vh;
+}
+
+.header {
+    border-bottom: 0.9px solid #eeeeee;
+}
+
+.time {
+    position: absolute;
+    bottom: 0;
+    right: 1rem;
+    font-size: 2rem;
+    font-weight: 900;
+    font-style: italic;
+    color: #99999940;
+    pointer-events: none;
+}

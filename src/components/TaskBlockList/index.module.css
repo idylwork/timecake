@@ -1,0 +1,15 @@
+.root {
+  flex-grow: 1;
+  padding: 1rem 1rem;
+  overflow: scroll;
+  overscroll-behavior: contain;
+}
+
+.container {
+  height: 0;
+  position: relative;
+}
+
+.foregraound {
+  width: 100%;
+}

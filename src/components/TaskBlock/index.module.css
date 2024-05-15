@@ -1,0 +1,99 @@
+.root {
+  position: absolute;
+  width: 100%;
+  padding: 0.1rem 0 0.05rem;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.block {
+  height: 100%;
+  color: #000000;
+  border-radius: 5px;
+  box-shadow: 0 5px 5px #00000020;
+
+  &.isDark {
+    color: #ffffff;
+  }
+}
+
+.time {
+  font-size: 0.6rem;
+  margin-right: 0.5rem;
+  min-width: 4rem;
+  white-space: nowrap;
+}
+
+.project {
+  min-width: 5em;
+  font-size: 0.7rem;
+  margin-right: 0.5rem;
+  background: none;
+}
+
+.form {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.row {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+}
+
+.resizeHandle {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 7px;
+  cursor: row-resize;
+}
+
+.button {
+  background: none;
+}
+
+.span + .span {
+  display: block;
+}
+
+.isSmall {
+  .time {
+    font-size: 0.5rem;
+  }
+  .project {
+    font-size: 0.7rem;
+  }
+  .body {
+    font-size: 0.8rem;
+  }
+  .span {
+    display: inline;
+  }
+  .span + .span {
+    margin-left: 0.3em;
+  }
+}

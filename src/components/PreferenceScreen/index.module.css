@@ -1,0 +1,14 @@
+.heading {
+  font-size: 0.7rem;
+  color: #999999;
+}
+
+.textarea {
+  width: 100%;
+  height: 8rem;
+  min-height: 3rem;
+  font-size: 0.8rem;
+  resize: vertical;
+  border: 0.9px solid #cccccc;
+  border-radius: 0.2rem;
+}
