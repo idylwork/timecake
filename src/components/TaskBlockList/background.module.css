@@ -19,7 +19,7 @@
   min-width: 4rem;
   font-size: 0.7rem;
   font-weight: 500;
-  color: #cccccc;
+  color: var(--muted-color);
   text-align: start;
 }
 
@@ -27,7 +27,8 @@
   flex-grow: 1;
   top: 0;
   height: 1px;
-  border-top: 0.5px solid #dddddd;
+  border-top: 0.5px solid;
+  border-top-color: var(--muted-color);
 }
 
 .currentTime {

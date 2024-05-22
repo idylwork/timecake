@@ -20,48 +20,62 @@
 .time {
   font-size: 0.6rem;
   margin-right: 0.5rem;
-  min-width: 4rem;
+  min-width: 5.8rem;
   white-space: nowrap;
 }
 
 .project {
   min-width: 5em;
+  height: 1.2rem;
   font-size: 0.7rem;
   margin-right: 0.5rem;
   background: none;
+  padding: 0;
 }
 
 .form {
-  flex-grow: 1;
   display: flex;
   align-items: center;
   height: 100%;
 }
 
 .body {
-  display: flex;
-  align-items: center;
   width: 100%;
-  height: 100%;
+  min-height: 1.5em;
+  font-size: 0.8rem;
   padding: 0;
+  overflow: hidden;
+  cursor: text;
+}
+
+.body:hover {
+  background: #cccccc30;
+}
+.body:focus {
+  background: #cccccc30;
 }
 
 .container {
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   height: 100%;
   box-sizing: border-box;
 }
 
-.row {
-  flex-grow: 1;
+.content {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   padding: 0 0.5rem;
   box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  align-items: center;
 }
 
 .resizeHandle {
@@ -76,24 +90,30 @@
   background: none;
 }
 
-.span + .span {
-  display: block;
-}
-
 .isSmall {
+  .content {
+    flex-direction: row;
+  }
+  .row {
+    /* display: contents; */
+  }
   .time {
+    min-width: 2rem;
     font-size: 0.5rem;
   }
   .project {
     font-size: 0.7rem;
   }
+  .content {
+    flex-grow: 1;
+  }
   .body {
-    font-size: 0.8rem;
-  }
-  .span {
-    display: inline;
-  }
-  .span + .span {
-    margin-left: 0.3em;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-size: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

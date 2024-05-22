@@ -6,7 +6,8 @@
 }
 
 .header {
-    border-bottom: 0.9px solid #eeeeee;
+    border-bottom: 0.9px solid;
+    border-bottom-color: var(--muted-color);
 }
 
 .time {

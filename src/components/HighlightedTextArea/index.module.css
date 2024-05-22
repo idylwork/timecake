@@ -1,0 +1,148 @@
+.root {
+  position: relative;
+  height: 200px;
+  overflow: scroll;
+  font-size: 0.8rem;
+  line-height: 1.4em;
+
+  caret-color: var(--text-color);
+}
+
+.textarea,
+.highlight {
+  display: block;
+  width: 100%;
+  /* font-family: monospace; */
+  font-weight: 100;
+  color: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  background: none;
+
+  box-sizing: border-box;
+  border: none;
+  padding: 0.75rem 0.5rem;
+}
+
+.textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: transparent;
+  overflow: hidden;
+  resize: none;
+}
+
+.highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100%;
+  pointer-events: none;
+  padding-bottom: 1.5rem;
+}
+
+.highlightRow {
+  pointer-events: none;
+  min-height: 1.1em;
+}
+
+.highlightHeading {
+  color: blue;
+  text-shadow: 0.7px 0 blue;
+}
+
+.highlightListMark {
+  color: orange;
+}
+
+.highlightCodeBlock {
+  color: #880000;
+  padding: 1px 0;
+  border: 0.5px solid #aaaaaa;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin: -1.5px -0.5px;
+}
+
+.highlightCodeBlock + .highlightCodeBlock {
+  border-top: none;
+  padding-top: 0;
+  margin-top: -1px;
+}
+
+@media (max-resolution: 1dppx) {
+  .highlightCodeBlock {
+    margin: -2px -0.5px;
+  }
+}
+
+.highlightSearch {
+  color: white;
+  text-shadow: 0.7px 0 white;
+  background: #3fbb85;
+}
+
+.highlightNone {
+  visibility: hidden;
+}
+
+.highlightBox {
+  --highlight-color: #ffffff;
+  position: relative;
+  color: var(--highlight-color);
+}
+
+.highlightBox::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  width: 100%;
+  height: 80%;
+  border: 0.5px solid var(--highlight-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin: 1% -0.5px;
+}
+
+.highlightVariable {
+  --highlight-color: #ff6666;
+}
+
+.highlightSectionStart {
+  --highlight-color: #b1b0da;
+}
+
+.highlightSectionStart::before {
+  content: "▽";
+  position: absolute;
+  font-size: 0.5em;
+  margin-left: 0.8em;
+}
+
+.highlightSectionStart::after {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.highlightSectionEnd {
+  --highlight-color: #b1b0da;
+}
+
+.highlightSectionEnd::before {
+  content: "△";
+  position: absolute;
+  font-size: 0.5em;
+  margin-left: 0.8em;
+}
+
+.highlightSectionEnd::after {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.tag {
+  color: transparent;
+}

@@ -20,7 +20,7 @@ interface Props {
  * 1つのタスク時間帯を表現するブロック
  * @param props.task - タスク
  * @param props.onChange - データ変更時
- * @returns 
+ * @returns
  */
 export const TaskBlock = ({ task, onChange }: Props) => {
   /** プロジェクトリスト */
@@ -44,7 +44,6 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   /** 表示領域が小さいか */
   const isSmallSize = useMemo(() => task.minutes + resizingMinutes < 60, [task.startAt, task.endAt, resizingMinutes]);
 
-
   /**
    * 編集開始
    */
@@ -66,15 +65,15 @@ export const TaskBlock = ({ task, onChange }: Props) => {
    * プロジェクト選択を変更
    * @param project - 選択されたプロジェクト (なにも選択されなかった場合はnull)
    */
-  const handleProjectChange = (project: Project | null) => {    
+  const handleProjectChange = (project: Project | null) => {
     setIsProjectEditing(false);
     if (!project) return;
     onChange(new Task({ ...task, projectId: project.id }));
   }
-  
+
   /**
    * 内容入力時の処理
-   * @param event 
+   * @param event
    */
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.currentTarget.value);
@@ -82,7 +81,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
 
   /**
    * 移動中の処理
-   * @param y 
+   * @param y
    */
   const handleMove = (y: number) => {
     setMovingMinutes(floorNumberUnit(-y / PIXEL_PER_MINUTE, UNIT_MINUTES));
@@ -102,7 +101,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
 
   /**
    * リサイズ中の処理
-   * @param y 
+   * @param y
    */
   const handleResize = (y: number) => {
     const newDraggingMinutes = floorNumberUnit(-y, UNIT_MINUTES);
@@ -140,13 +139,14 @@ export const TaskBlock = ({ task, onChange }: Props) => {
     >
       <VerticalDraggableArea onDragging={handleMove} onDragEnd={handleMoveEnd} className={classNames(styles.block, (project?.color.isDark ?? false) && styles.isDark, isSmallSize && styles.isSmall)} style={{ backgroundColor: project?.color.toString() ?? '#dddddd' }}>
         <div className={styles.container}>
-          <div className={styles.row}>
-            <time className={styles.time}>
-              <span className={styles.span}>{`${task.startAt} - ${task.endAt.toAdded(resizingMinutes)}`}</span>
-              <span className={styles.span}>({`${(minutes + resizingMinutes) / 60}`}h)</span>
-            </time>
-            <ProjectSelectorPopover open={isProjectEditing} onChange={handleProjectChange} />
-            <button type="button" className={styles.project} onClick={() => setIsProjectEditing(true)}>{project?.name ?? '-'}</button>
+          <div className={styles.content}>
+            <div className={styles.row}>
+              <time className={styles.time}>
+                {`${task.startAt} - ${task.endAt.toAdded(resizingMinutes)}`} ({`${(minutes + resizingMinutes) / 60}`}h)
+              </time>
+              <ProjectSelectorPopover open={isProjectEditing} onChange={handleProjectChange} />
+              <button type="button" className={styles.project} onClick={() => setIsProjectEditing(true)}>{project?.name ?? '-'}</button>
+            </div>
             {isEditable ? (
               <form className={styles.form} onSubmit={endEdit}>
                 <input ref={inputRef} type="text" className={styles.body} value={body} onChange={handleBodyChange} onBlur={endEdit} />

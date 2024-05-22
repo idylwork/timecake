@@ -9,6 +9,9 @@ const projects: ProjectData[] = [
   { name: 'Fv抽選アプリ', color: '#ddffcc' },
 ];
 
+/**
+ * プロジェクトリストのストレージデータAtom
+ */
 const projectsDataAtom = atomWithStorage('projects', projects);
 
 /**
@@ -19,6 +22,9 @@ export const projectsAtom = atom(
   (_, set, update: Project[]) => set(projectsDataAtom, update)
 );
 
+/**
+ * 日別タスクのストレージデータAtom
+ */
 const dateTaskDataAtom = atomWithStorage<DateTaskData>('dateTask', {
   date: new Date(),
   tasks: []
@@ -42,6 +48,9 @@ export const ScreenMode = {
 } as const;
 export type ScreenMode = typeof ScreenMode[keyof typeof ScreenMode];
 
+/**
+ * アプリケーションの表示モードAtom
+ */
 export const displayModeAtom = atom<ScreenMode>(ScreenMode.taskEditor);
 
 /**
@@ -58,4 +67,9 @@ export const outputTemplateAtom = atomWithStorage('outputTemplate', '```\n【日
 + '・{{name}} {{description}} {{hours}}h\n'
 + '{{/projects}}\n'
 + '＜コメント＞\n'
-+ '```\n')
++ '```\n');
+
+/**
+ * タスク区切り文字
+ */
+export const taskSeparatorAtom = atomWithStorage('taskSeparator', '・');

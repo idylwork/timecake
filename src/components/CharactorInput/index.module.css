@@ -1,0 +1,10 @@
+.root {
+  text-align: center;
+  border: 0.9px solid #cccccc;
+  border-radius: 0.2rem;
+  width: 100%;
+}
+
+.root:focus {
+  text-align: left;
+}

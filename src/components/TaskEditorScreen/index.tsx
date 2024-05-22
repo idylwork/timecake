@@ -7,14 +7,14 @@ import ScreenLayout from '../ScreenLayout';
 
 /**
  * タスク編集画面
- * @returns 
+ * @returns
  */
 export default function TaskEditorScreen() {
   /** 日別タスクグループ */
   const [dateTask] = useAtom(dateTaskAtom);
 
   return (
-    <ScreenLayout title={dateTask.date.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })} padding={false}>              
+    <ScreenLayout title={dateTask.date.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })} padding={false}>
       <div className={styles.header}>
         <ActionMenu />
       </div>

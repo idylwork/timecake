@@ -1,6 +1,7 @@
 .root {
     position: relative;
     z-index: 1000;
+    display: inline-block;
 }
 
 .dialog {
@@ -21,7 +22,7 @@
     align-items: center;
     gap: 0.2rem;
     font-size: 0.8rem;
-    text-align: left;    
+    text-align: left;
 }
 
 .badge {

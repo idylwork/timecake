@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { dateTaskAtom, outputTemplateAtom, projectsAtom } from '../../atoms/dateTaskState';
+import { dateTaskAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import DateTask from '../../models/DateTask';
 import { replaceMustache } from '../../utils/string';
 import styles from './index.module.css';
@@ -10,6 +10,10 @@ import Task from '../../models/Task';
 import { floorNumberUnit } from '../../utils/number';
 import { UNIT_MINUTES } from '../../constants';
 
+/**
+ * タスクに関する操作ボタン
+ * @returns
+ */
 export default function ActionMenu() {
   /** 日別タスクグループ */
   const [dateTask, setDateTask] = useAtom(dateTaskAtom);
@@ -17,24 +21,26 @@ export default function ActionMenu() {
   const projects = useAtomValue(projectsAtom);
   /** 出力用テンプレート */
   const outputTemplate = useAtomValue(outputTemplateAtom);
+  /** タスク区切り文字 */
+  const taskSeparator = useAtomValue(taskSeparatorAtom);
 
   /**
    * タスクを全削除
    */
   const removeAllTasks = () => {
     setDateTask(new DateTask({ date: dateTask.date, tasks: [] }));
-  }; 
+  };
 
   /**
    * 最後のタスクを現在時刻まで延長する
    */
   const fillCurrentTask = () => {
     const newTasks = [...dateTask.tasks];
-    const [currentTask] = newTasks.splice(-1, 1);    
+    const [currentTask] = newTasks.splice(-1, 1);
     if (!currentTask) return;
 
-    const now = floorNumberUnit((new Time()).valueOf(), UNIT_MINUTES);
-    if (currentTask.endAt.valueOf() >= now) return;
+    const now = new Time(floorNumberUnit((new Time()).valueOf(), UNIT_MINUTES));
+    if (currentTask.endAt >= now) return;
 
     setDateTask(new DateTask({ date: dateTask.date, tasks: [...newTasks, new Task({ ...currentTask, endAt: now })] }));
   }
@@ -44,12 +50,12 @@ export default function ActionMenu() {
    */
   const output = () => {
     const debugDateTask = new DateTask({ date: new Date(), tasks: dateTask.tasks });
-    const total = debugDateTask.totalize(projects, { separator: '・' });
+    const total = debugDateTask.totalize(projects, { separator: taskSeparator });
     const text = replaceMustache(outputTemplate, total);
     console.info(text);
     navigator.clipboard.writeText(text);
   };
-  
+
   return (
     <section className={styles.root} data-tauri-drag-region="default">
       <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>クリア</Button>

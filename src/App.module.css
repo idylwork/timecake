@@ -1,3 +1,44 @@
-.root {
-    height: 100vh;
+.controls {
+  position: fixed;
+  top: 0.3rem;
+  left: 0.3rem;
+  display: flex;
+  gap: 6px;
+  color: transparent;
+  z-index: 1000;
+}
+
+.controlButton {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  font-size: 0.4rem;
+  background: #88888822;
+  border: 0.5px solid #88888844;
+  border-radius: 100%;
+}
+
+.isWindowFocused .close {
+  background: #f35c54;
+  border-color: #f0554d;
+}
+
+.isWindowFocused .minimize {
+  background: #febc30;
+  border-color: #f0b02f;
+}
+
+.isWindowFocused:hover .close {
+  color: #750301;
+}
+
+.isWindowFocused:hover .minimize {
+  color: #b1700b;
+}
+
+.controlIcon {
+  width: 9px;
+  margin: auto;
+  height: 11px;
+  padding-right: 1%;
 }

@@ -1,45 +1,60 @@
 .root {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #00000005;
-    padding: 0 0.8rem;
-    border-radius: 0.4rem;
-    box-shadow: 0 3px 6px #00000020;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #88888810;
+  padding: 0 0.8rem;
+  border-radius: 0.4rem;
+  box-shadow: 0 3px 6px #00000020;
 }
 
+.root:hover {
+  animation: hover-animation 1s;
+}
 .root:active {
-    opacity: 0.6;
+  opacity: 0.6;
+}
+
+@keyframes hover-animation {
+  0% {
+    background: #88888810;
+  }
+  20% {
+    background: #ffffffff;
+  }
+  100% {
+    background: #88888810;
+  }
 }
 
 .icon {
-    margin-left: -0.2em;
-    margin-right: 0.2em;
+  margin-left: -0.2em;
+  margin-right: 0.2em;
 }
 
 .complete {
-    position: absolute;
-    inset: 0;
-    font-weight: 500;
-    color: #ffffff;
-    background: #0fb665;
-    opacity: 0;
-    transition: opacity 0.2s;
-    border-radius: 0.4rem;
+  position: absolute;
+  inset: 0;
+  font-weight: 500;
+  color: #ffffff;
+  background: #0fb665;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 0.4rem;
 }
 .isComplete {
-    opacity: 1;
-    pointer-events: non;
+  opacity: 1;
+  pointer-events: non;
 }
 
 .small {
-    font-size: 0.7rem;
+  font-size: 0.7rem;
 }
 .middle {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 .large {
-    font-size: 1.2rem;
-    width: 100%;
+  font-size: 1.2rem;
+  width: 100%;
 }

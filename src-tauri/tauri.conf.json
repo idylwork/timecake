@@ -13,7 +13,9 @@
     "allowlist": {
       "all": false,
       "window": {
-        "startDragging": true
+        "startDragging": true,
+        "close": true,
+        "minimize": true
       },
       "shell": {
         "all": false,
@@ -22,18 +24,18 @@
     },
     "windows": [
       {
-        "decorations": false,        
+        "decorations": false,
         "fullscreen": false,
         "resizable": true,
         "title": "Timecake",
-        "width": 800,
-        "height": 600,
-        "transparent": true
+        "width": 300,
+        "height": 600
       }
     ],
     "security": {
       "csp": null
     },
+    "macOSPrivateApi": true,
     "bundle": {
       "active": true,
       "targets": "all",

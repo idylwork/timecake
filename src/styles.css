@@ -1,16 +1,37 @@
 :root {
+  --text-color: #0f0f0f;
+  --secondary-color: #dddddd60;
+  --muted-color: #0f0f0f44;
+
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  color: var(--text-color);
+  background-color: #ffffffee;
+  background-color: #ffffffee;
+
+  border-radius: 0.4rem;
   overscroll-behavior: none;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: #f6f6f6;
+    --secondary-color: #dddddd60;
+    --muted-color: #f6f6f644;
+
+    background-color: #2f2f2fee;
+  }
+
+  a:hover {
+    color: #24c8db;
+  }
 }
 
 /* CSS Reset */
@@ -54,29 +75,4 @@ button {
   color: inherit;
   outline: none;
   background: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  textarea,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
 }
