@@ -55,6 +55,12 @@
   background: #cccccc30;
 }
 
+.separator {
+  font-size: 0.8em;
+  opacity: 0.4;
+  vertical-align: middle;
+}
+
 .container {
   position: relative;
   display: flex;

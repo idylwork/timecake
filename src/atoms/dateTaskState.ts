@@ -73,3 +73,13 @@ export const outputTemplateAtom = atomWithStorage('outputTemplate', '```\n【日
  * タスク区切り文字
  */
 export const taskSeparatorAtom = atomWithStorage('taskSeparator', '・');
+
+
+export const MinuteStep = [15, 30, 60] as const;
+export type MinuteStep = typeof MinuteStep[number];
+
+
+/**
+ * タスク時間単位
+ */
+export const minuteStepAtom = atomWithStorage<MinuteStep>('minuteStep', 15);

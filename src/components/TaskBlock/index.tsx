@@ -3,12 +3,12 @@ import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
 import styles from './index.module.css';
 import Task from '../../models/Task';
-import { projectsAtom } from '../../atoms/dateTaskState';
+import { minuteStepAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import { floorNumberUnit } from '../../utils/number';
 import Project from '../../models/Project';
 import VerticalDraggableArea from '../VerticalDraggableArea';
 import ProjectSelectorPopover from '../ProjectSelectorPopover';
-import { PIXEL_PER_MINUTE, UNIT_MINUTES } from '../../constants';
+import { PIXEL_PER_MINUTE } from '../../constants';
 import { TrashIcon } from '@radix-ui/react-icons';
 
 interface Props {
@@ -43,6 +43,10 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   /** 表示領域が小さいか */
   const isSmallSize = useMemo(() => task.minutes + resizingMinutes < 60, [task.startAt, task.endAt, resizingMinutes]);
+  /** タスク区切り文字 */
+  const taskSeparator = useAtomValue(taskSeparatorAtom);
+  /** タスク時間単位 */
+  const minuteStep = useAtomValue(minuteStepAtom);
 
   /**
    * 編集開始
@@ -84,7 +88,8 @@ export const TaskBlock = ({ task, onChange }: Props) => {
    * @param y
    */
   const handleMove = (y: number) => {
-    setMovingMinutes(floorNumberUnit(-y / PIXEL_PER_MINUTE, UNIT_MINUTES));
+    const startAt = task.startAt.valueOf();
+    setMovingMinutes(floorNumberUnit(startAt + (-y / PIXEL_PER_MINUTE), minuteStep) - startAt);
   };
 
   /**
@@ -104,7 +109,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
    * @param y
    */
   const handleResize = (y: number) => {
-    const newDraggingMinutes = floorNumberUnit(-y, UNIT_MINUTES);
+    const newDraggingMinutes = floorNumberUnit(-y, minuteStep);
     if (-newDraggingMinutes < minutes) {
       setResizingMinutes(newDraggingMinutes);
     }
@@ -155,7 +160,12 @@ export const TaskBlock = ({ task, onChange }: Props) => {
                 </button>
               </form>
             ) : (
-              <div className={styles.body} onClick={startEdit}>{task.body}</div>
+              <div className={styles.body} onClick={startEdit}>{task.body.split(taskSeparator).map((bodyItem, index) => (
+                <span key={index}>
+                  {index > 0 && <span className={styles.separator}>{taskSeparator}</span>}
+                  {bodyItem}
+                </span>
+              ))}</div>
             )}
           </div>
           <VerticalDraggableArea className={styles.resizeHandle} onDragging={handleResize} onDragEnd={handleResizeEnd} />

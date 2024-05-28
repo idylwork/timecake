@@ -76,3 +76,8 @@ button {
   outline: none;
   background: none;
 }
+
+select {
+  color: inherit;
+  outline: none;
+}

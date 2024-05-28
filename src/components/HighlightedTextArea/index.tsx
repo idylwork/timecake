@@ -123,7 +123,7 @@ export default React.memo(React.forwardRef<HTMLTextAreaElement, Props>(({ value,
         onChange={handleChange}
       />
       <div ref={highlightRef} className={styles.highlight}>
-        {highlightDeltas.map((delta, index) => <EditorTextDelta type={delta.type} text={delta.text} indent={delta.indent} key={index} />)}
+        {highlightDeltas.map((delta, index) => <EditorTextDelta type={delta.type} text={delta.text} key={index} />)}
       </div>
     </div>
   )

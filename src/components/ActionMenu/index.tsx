@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { dateTaskAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { dateTaskAtom, minuteStepAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import DateTask from '../../models/DateTask';
 import { replaceMustache } from '../../utils/string';
 import styles from './index.module.css';
@@ -8,7 +8,6 @@ import Button from '../Button';
 import Time from '../../models/Time';
 import Task from '../../models/Task';
 import { floorNumberUnit } from '../../utils/number';
-import { UNIT_MINUTES } from '../../constants';
 
 /**
  * タスクに関する操作ボタン
@@ -23,6 +22,8 @@ export default function ActionMenu() {
   const outputTemplate = useAtomValue(outputTemplateAtom);
   /** タスク区切り文字 */
   const taskSeparator = useAtomValue(taskSeparatorAtom);
+  /** タスク時間単位 */
+  const minuteStep = useAtomValue(minuteStepAtom);
 
   /**
    * タスクを全削除
@@ -39,7 +40,7 @@ export default function ActionMenu() {
     const [currentTask] = newTasks.splice(-1, 1);
     if (!currentTask) return;
 
-    const now = new Time(floorNumberUnit((new Time()).valueOf(), UNIT_MINUTES));
+    const now = new Time(floorNumberUnit((new Time()).valueOf(), minuteStep));
     if (currentTask.endAt >= now) return;
 
     setDateTask(new DateTask({ date: dateTask.date, tasks: [...newTasks, new Task({ ...currentTask, endAt: now })] }));
@@ -50,7 +51,7 @@ export default function ActionMenu() {
    */
   const output = () => {
     const debugDateTask = new DateTask({ date: new Date(), tasks: dateTask.tasks });
-    const total = debugDateTask.totalize(projects, { separator: taskSeparator });
+    const total = debugDateTask.totalize(projects, { separator: taskSeparator, minuteStep: minuteStep });
     const text = replaceMustache(outputTemplate, total);
     console.info(text);
     navigator.clipboard.writeText(text);

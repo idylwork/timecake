@@ -1,4 +1,4 @@
-import { UNIT_MINUTES } from '../constants';
+import { MinuteStep } from '../atoms/dateTaskState';
 import { floorNumberUnit } from '../utils/number';
 import Project from './Project';
 import Task, { TaskData as TaskProps } from './Task';
@@ -25,8 +25,8 @@ export default class DateTask {
 
   /**
    * タスクを追加する
-   * @param startAt 
-   * @returns 
+   * @param startAt
+   * @returns
    */
   appendTask(startAt: Time) {
     this.tasks = [...this.tasks, new Task({ body: '', startAt: startAt, endAt: startAt })];
@@ -35,7 +35,7 @@ export default class DateTask {
 
   /**
    * データ保存用のオブジェクトに変換する
-   * @returns 
+   * @returns
    */
   toObject() {
     return {
@@ -78,10 +78,10 @@ export default class DateTask {
   /**
    * 追加できるタスクか
    * 時間範囲を検証する
-   * 
-   * @param task 
+   *
+   * @param task
    * @param excludedIndex 検証から除外するインデックス
-   * @returns 
+   * @returns
    */
   validateTask(task: Task, excludedIndex: number = -1) {
     // 時間範囲が有効な範囲内か
@@ -89,16 +89,16 @@ export default class DateTask {
 
     // 時間範囲の重複がないか
     return this.tasks.every((other, otherIndex) => {
-      if (otherIndex === excludedIndex) return true;     
+      if (otherIndex === excludedIndex) return true;
       return task.startAt < other.startAt ? task.endAt <= other.startAt : other.endAt <= task.startAt;
     });
   }
 
   /**
    * 集計する
-   * @returns 
+   * @returns
    */
-  totalize(projects: Project[], { separator = '・' }: { separator?: string } = {}) {
+  totalize(projects: Project[], { separator = '・', minuteStep = 30 }: { separator?: string, minuteStep?: MinuteStep } = {}) {
     let startAt: Time | null = null;
     let endAt: Time | null = null;
     let totalHours = 0;
@@ -108,7 +108,7 @@ export default class DateTask {
       if (!project) {
         return []
       }
-      
+
       /** プロジェクトの合計時間 */
       let minutes = 0;
       /** プロジェクトの説明文種類 */
@@ -116,7 +116,9 @@ export default class DateTask {
       tasks.forEach((task) => {
         minutes += task.minutes;
         if (task.body) {
-          bodySet.add(task.body);
+          task.body.split(separator).forEach((bodyItem) => {
+            bodySet.add(bodyItem);
+          });
         }
         if (!startAt || task.startAt < startAt) {
           startAt = task.startAt
@@ -126,7 +128,7 @@ export default class DateTask {
         }
       });
 
-      const hours = floorNumberUnit(minutes, UNIT_MINUTES) / 60;
+      const hours = floorNumberUnit(minutes, minuteStep) / 60;
       totalHours += hours;
 
       return { name: project.name, hours, description: [...bodySet].join(separator) }

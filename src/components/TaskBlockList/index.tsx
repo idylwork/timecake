@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import styles from './index.module.css';
-import { dateTaskAtom, projectsAtom } from '../../atoms/dateTaskState';
+import { dateTaskAtom, minuteStepAtom, projectsAtom } from '../../atoms/dateTaskState';
 import { TaskBlock } from '../TaskBlock';
 import Task from '../../models/Task';
 import { floorNumberUnit } from '../../utils/number';
 import TaskBlockListBackground from './background';
 import DateTask from '../../models/DateTask';
 import Time from '../../models/Time';
-import { PIXEL_PER_MINUTE, UNIT_MINUTES } from '../../constants';
+import { PIXEL_PER_MINUTE } from '../../constants';
 
 /**
  * 1日分のタスク設定リスト
@@ -20,14 +20,16 @@ export default function TaskBlockList() {
   /** 日別タスクグループ */
   const [dateTask, setDateTask] = useAtom(dateTaskAtom);
   /** プロジェクトリスト */
-  const projects = useAtomValue(projectsAtom)
+  const projects = useAtomValue(projectsAtom);
+  /** タスク時間単位 */
+  const minuteStep = useAtomValue(minuteStepAtom);
   /** コンポーネントルート要素の参照 */
   const rootRef = useRef<HTMLDivElement>(null);
 
   /**
    * 日別タスクグループを更新
-   * @param index 
-   * @param task 
+   * @param index
+   * @param task
    */
   const updateDateTask = (index: number, task: Task | null) => {
     const tasks = task
@@ -49,7 +51,7 @@ export default function TaskBlockList() {
               if (next && next.startAt < task.endAt) {
                 task.endAt = next.startAt;
               } else if (Time.MAX < task.endAt) {
-                task.endAt = Time.MAX;               
+                task.endAt = Time.MAX;
               }
             }
           }
@@ -64,16 +66,16 @@ export default function TaskBlockList() {
 
   /**
    * クリック位置に応じてタスクを新規追加する
-   * @param event 
+   * @param event
    */
   const appendTask = (event: React.MouseEvent<HTMLElement>) => {
     const layerY = event.nativeEvent.layerY - (rootRef.current ? rootRef.current.scrollTop - rootRef.current.scrollTop : 0);
-    const startAt = new Time(floorNumberUnit(layerY / PIXEL_PER_MINUTE, UNIT_MINUTES));
-    const newTask = new Task({ projectId: projects[0].id, body: '', startAt: startAt, endAt: startAt.toAdded(Math.max(UNIT_MINUTES, 60)) });
+    const startAt = new Time(floorNumberUnit(layerY / PIXEL_PER_MINUTE, minuteStep));
+    const newTask = new Task({ projectId: projects[0].id, body: '', startAt: startAt, endAt: startAt.toAdded(Math.max(minuteStep, 60)) });
 
     // 下にタスクがある場合は時間範囲を狭めて追加できないか試行
     if (!dateTask.validateTask(newTask)) {
-      newTask.endAt = startAt.toAdded(Math.max(UNIT_MINUTES, 30));
+      newTask.endAt = startAt.toAdded(Math.max(minuteStep, 30));
       if (!dateTask.validateTask(newTask)) return;
     };
 
