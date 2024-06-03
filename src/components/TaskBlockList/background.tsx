@@ -9,8 +9,8 @@ interface Props {
 
 /**
  * タスクリストの背景
- * @param param0 
- * @returns 
+ * @param props.onClick - クリック時の処理
+ * @returns
  */
 export default function TaskBlockListBackground({ onClick }: Props) {
   /** 現在時刻 */
@@ -43,4 +43,3 @@ export default function TaskBlockListBackground({ onClick }: Props) {
     </div>
   );
 };
-  

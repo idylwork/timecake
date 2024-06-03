@@ -5,7 +5,7 @@ import Task, { TaskData as TaskProps } from './Task';
 import Time from './Time';
 
 export interface DateTaskData {
-  date: Date | string;
+  date: string | Date;
   tasks?: Task[] | TaskProps[];
 }
 
@@ -13,13 +13,13 @@ export interface DateTaskData {
  * 日別のタスク情報モデル
  */
 export default class DateTask {
-  /** 日付 */
-  date: Date;
+  /** 日付文字列 YYYY-MM-DD */
+  date: string;
   /** タスクリスト */
   tasks: Task[]
 
   constructor({ date, tasks = [] }: DateTaskData) {
-    this.date = typeof date === 'string' ? new Date(date) : date;
+    this.date = date instanceof Date ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}` : date;
     this.tasks = tasks[0] instanceof Task ? tasks as Task[] : tasks.map((task) => new Task(task));
   }
 
@@ -42,6 +42,27 @@ export default class DateTask {
       ...this,
       tasks: this.tasks.map((task) => task.toObject()),
     }
+  }
+
+  /**
+   * 年を取得する
+   */
+  getYear() {
+    return Number(this.date.split('-')[0]);
+  }
+
+  /**
+   * 月を取得する
+   */
+  getMonth() {
+    return Number(this.date.split('-')[1]);
+  }
+
+  /**
+   * 日を取得する
+   */
+  getDate() {
+    return Number(this.date.split('-')[2]);
   }
 
   /**
@@ -135,8 +156,8 @@ export default class DateTask {
     }).filter(Boolean);
 
     return {
-      month: this.date.getMonth() + 1,
-      date: this.date.getDate(),
+      month: this.getMonth(),
+      date: this.getDate(),
       startAt: `${startAt ?? '?:??'}`,
       endAt: `${endAt ?? '?:??'}`,
       projects: projectsTotal,

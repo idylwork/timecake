@@ -27,7 +27,7 @@ export default function ScreenLayout({ title, padding = true, children }: Props)
 /**
  * レイアウト下部のボタン配置部
  * @param props.children
- * @returns 
+ * @returns
  */
 export function ScreenActions({ children }: { children?: React.ReactNode }) {
   return (

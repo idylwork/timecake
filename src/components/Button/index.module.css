@@ -36,6 +36,9 @@
 .complete {
   position: absolute;
   inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-weight: 500;
   color: #ffffff;
   background: #0fb665;
@@ -43,9 +46,10 @@
   transition: opacity 0.2s;
   border-radius: 0.4rem;
 }
+
 .isComplete {
   opacity: 1;
-  pointer-events: non;
+  pointer-events: none;
 }
 
 .small {
@@ -57,4 +61,38 @@
 .large {
   font-size: 1.2rem;
   width: 100%;
+}
+
+.group {
+  display: flex;
+  box-shadow: 0 3px 6px #00000020;
+  border-radius: 0.4rem;
+}
+
+.group > .root {
+  box-shadow: none;
+  padding: 0 0.3rem;
+  border-radius: 0;
+}
+
+.group > .root:first-child {
+  border-top-left-radius: 0.4rem;
+  border-bottom-left-radius: 0.4rem;
+}
+
+.group > .root:last-child {
+  border-top-right-radius: 0.4rem;
+  border-bottom-right-radius: 0.4rem;
+}
+
+.group > .root:nth-of-type(n+2) {
+  border-left: 0.5px solid #00000010;
+}
+
+.group > .root .icon {
+  margin: 0;
+}
+
+.group > .root .complete {
+  border-radius: 0;
 }

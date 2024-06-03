@@ -1,12 +1,13 @@
 import { useAtom, useSetAtom } from 'jotai';
 import ScreenLayout, { ScreenActions } from '../ScreenLayout';
 import styles from './index.module.css';
-import { ScreenMode, MinuteStep, displayModeAtom, outputTemplateAtom, taskSeparatorAtom, minuteStepAtom } from '../../atoms/dateTaskState';
+import { ScreenMode, MinuteStep, screenModeAtom, outputTemplateAtom, taskSeparatorAtom, minuteStepAtom } from '../../atoms/dateTaskState';
 import { CheckIcon } from '@radix-ui/react-icons';
 import Button from '../Button';
 import { CharactorInput } from '../CharactorInput';
 import HighlightedTextArea from '../HighlightedTextArea';
 import { useRef } from 'react';
+import NavigationTab from '../NavigationTab';
 
 /**
  * アプリケーション設定画面
@@ -14,7 +15,7 @@ import { useRef } from 'react';
  */
 export default function PreferenceScreen() {
   /** 画面表示モード */
-  const setDisplayingMode = useSetAtom(displayModeAtom);
+  const setScreenMode = useSetAtom(screenModeAtom);
   /** 出力用テンプレート */
   const [outputTemplate, setOutputTemplate] = useAtom(outputTemplateAtom);
   /** タスク区切り文字 */
@@ -41,12 +42,17 @@ export default function PreferenceScreen() {
     }, 0);
   };
 
+  /**
+   * タスク時間単位変更時の処理
+   * @param event
+   */
   const handleMinuteStepChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setMinuteStep(event.currentTarget.value)
+    setMinuteStep(Number(event.currentTarget.value) as MinuteStep)
   };
 
   return (
     <ScreenLayout title="アプリケーション設定">
+      <NavigationTab items={{'一般': ScreenMode.preference, 'プロジェクト': ScreenMode.projectSetting }} selection={ScreenMode.preference} onChange={(screenMode) => setScreenMode(screenMode)} />
       <label className={styles.label}>
         <div className={styles.heading}>出力用テンプレート</div>
         <HighlightedTextArea value={outputTemplate} setValue={setOutputTemplate} className={styles.textarea} ref={outputTemplateRef} />
@@ -77,7 +83,7 @@ export default function PreferenceScreen() {
       </label>
 
       <ScreenActions>
-        <Button size="large" className={styles.ok} icon={<CheckIcon />} onClick={() => setDisplayingMode(ScreenMode.taskEditor)}>OK</Button>
+        <Button size="large" className={styles.ok} icon={<CheckIcon />} onClick={() => setScreenMode(ScreenMode.taskEditor)}>OK</Button>
       </ScreenActions>
     </ScreenLayout>
   );

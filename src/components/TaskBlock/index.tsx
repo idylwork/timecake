@@ -3,13 +3,14 @@ import { useAtomValue } from 'jotai';
 import classNames from 'classnames';
 import styles from './index.module.css';
 import Task from '../../models/Task';
-import { minuteStepAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { minuteStepAtom, projectsAtom, taskBodyLogsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import { floorNumberUnit } from '../../utils/number';
 import Project from '../../models/Project';
 import VerticalDraggableArea from '../VerticalDraggableArea';
 import ProjectSelectorPopover from '../ProjectSelectorPopover';
 import { PIXEL_PER_MINUTE } from '../../constants';
 import { TrashIcon } from '@radix-ui/react-icons';
+
 
 interface Props {
   task: Task;

@@ -10,9 +10,9 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
 
 /**
  * ボタン
- * 
+ *
  * @param props - buttonタグと共通
- * @returns 
+ * @returns
  */
 export default function Button({ icon = null, size = 'middle', complete = '', className, onClick, children, ...props }: Props) {
   /** 完了時の表示をするか */
@@ -20,9 +20,9 @@ export default function Button({ icon = null, size = 'middle', complete = '', cl
 
   /**
    * クリック時の処理
-   * 
-   * @param event 
-   * @returns 
+   *
+   * @param event
+   * @returns
    */
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (!onClick) return;
@@ -31,7 +31,7 @@ export default function Button({ icon = null, size = 'middle', complete = '', cl
     setTimeout(() => {
       setIsComplete(false);
     }, 1000)
-  }
+  };
 
   return (
     <button type="button" className={classNames(styles.root, styles[size], className)} onClick={handleClick} {...props}>
@@ -41,5 +41,22 @@ export default function Button({ icon = null, size = 'middle', complete = '', cl
       {children}
       {complete && <div className={classNames(styles.complete, isComplete && styles.isComplete)}>{complete}</div>}
     </button>
-  )
+  );
+}
+
+interface GroupProps {
+  children: React.ReactNode;
+}
+
+/**
+ * ボタングループコンポーネント
+ * @param props.children
+ * @returns
+ */
+export function ButtonGroup({ children }: GroupProps) {
+  return (
+    <div className={styles.group}>
+      {children}
+    </div>
+  );
 }

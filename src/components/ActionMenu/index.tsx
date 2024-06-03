@@ -1,10 +1,10 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { dateTaskAtom, minuteStepAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { dateTaskAtom, dateTaskLogsAtom, minuteStepAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import DateTask from '../../models/DateTask';
 import { replaceMustache } from '../../utils/string';
 import styles from './index.module.css';
-import { CopyIcon, Cross2Icon, PinBottomIcon } from '@radix-ui/react-icons';
-import Button from '../Button';
+import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, Cross2Icon, PinBottomIcon } from '@radix-ui/react-icons';
+import Button, { ButtonGroup } from '../Button';
 import Time from '../../models/Time';
 import Task from '../../models/Task';
 import { floorNumberUnit } from '../../utils/number';
@@ -24,6 +24,23 @@ export default function ActionMenu() {
   const taskSeparator = useAtomValue(taskSeparatorAtom);
   /** タスク時間単位 */
   const minuteStep = useAtomValue(minuteStepAtom);
+  const [dateTaskLogs, setDateTaskLogs] = useAtom(dateTaskLogsAtom);
+
+  /**
+   * 日付を移動する
+   * @param diff - 移動する日数
+   */
+  const moveDate = (diff: number | undefined = undefined) => {
+    // 現在の日別タスクをログに書き込み
+    setDateTaskLogs(dateTask);
+
+    // ログから日別タスクを読み込み
+    const date = diff !== undefined ? new Date(dateTask.getYear(), dateTask.getMonth() - 1, dateTask.getDate() + diff) : new Date();
+    let newDateTask = new DateTask({ date: date, tasks: [] });
+    if (dateTask.date === newDateTask.date) return;
+    newDateTask = dateTaskLogs.get(newDateTask.date) ?? newDateTask;
+    setDateTask(newDateTask);
+  };
 
   /**
    * タスクを全削除
@@ -59,9 +76,14 @@ export default function ActionMenu() {
 
   return (
     <section className={styles.root} data-tauri-drag-region="default">
+      <ButtonGroup>
+        <Button size="small" icon={<ChevronLeftIcon />} onClick={() => moveDate(-1)}></Button>
+        <Button size="small" onClick={() => moveDate()}>今日</Button>
+        <Button size="small" icon={<ChevronRightIcon />} onClick={() => moveDate(1)}></Button>
+      </ButtonGroup>
       <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>クリア</Button>
-      <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillCurrentTask}>延長</Button>
       <Button size="small" icon={<CopyIcon />} complete="Copied!" onClick={output}>コピー</Button>
+      <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillCurrentTask}>延長</Button>
     </section>
   );
 }

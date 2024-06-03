@@ -1,0 +1,33 @@
+.root {
+  display: flex;
+  background: #22222240;
+  border-radius: 0.2rem;
+  color: #ffffff;
+  font-size: 0.6rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.item {
+  flex-grow: 1;
+  padding: 1px;
+}
+
+.input {
+  display: none;
+}
+
+.button {
+  display: block;
+  text-align: center;
+  padding-top: 0.1rem;
+  border-radius: 0.2rem;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.input:checked + .button {
+  color: #000000;
+  background: #ffffff;
+  box-shadow: 0 0 5px #00000040;
+}

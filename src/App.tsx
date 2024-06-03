@@ -4,7 +4,7 @@ import { appWindow } from '@tauri-apps/api/window';
 // import { invoke } from '@tauri-apps/api/tauri';
 import './App.module.css';
 import { DndContext } from '@dnd-kit/core';
-import { ScreenMode, displayModeAtom } from './atoms/dateTaskState';
+import { ScreenMode, screenModeAtom } from './atoms/dateTaskState';
 import ProjectSettingScreen from './components/ProjectSettingScreen';
 import TaskEditorScreen from './components/TaskEditorScreen';
 import PreferenceScreen from './components/PreferenceScreen';
@@ -31,8 +31,8 @@ const useWindowFocused = () => {
 }
 
 export default function App() {
-  /** 表示モード */
-  const displayMode = useAtomValue(displayModeAtom);
+  /** 画面表示モード */
+  const screenMode = useAtomValue(screenModeAtom);
 
   // const [greetMsg, setGreetMsg] = useState('');
   // async function greet() {
@@ -51,13 +51,13 @@ export default function App() {
           <MinusIcon className={styles.controlIcon} />
         </button>
       </div>
-      {displayMode === ScreenMode.taskEditor && (
+      {screenMode === ScreenMode.taskEditor && (
         <TaskEditorScreen />
       )}
-      {displayMode === ScreenMode.projectSetting && (
+      {screenMode === ScreenMode.projectSetting && (
         <ProjectSettingScreen />
       )}
-      {displayMode === ScreenMode.preference && (
+      {screenMode === ScreenMode.preference && (
         <PreferenceScreen />
       )}
     </DndContext>

@@ -1,6 +1,6 @@
 import { GearIcon } from '@radix-ui/react-icons';
 import styles from './index.module.css';
-import { ScreenMode, displayModeAtom } from '../../atoms/dateTaskState';
+import { ScreenMode, screenModeAtom } from '../../atoms/dateTaskState';
 import { useSetAtom } from 'jotai';
 
 interface Props {
@@ -10,17 +10,17 @@ interface Props {
 /**
  * アプリケーションのタイトル部分
  * @param props.children - タイトルに表示する内容
- * @returns 
+ * @returns
  */
 export default function Title({ children }: Props) {
-  /** 表示モード */
-  const setDisplayMode = useSetAtom(displayModeAtom);  
+  /** 画面表示モード */
+  const setScreenMode = useSetAtom(screenModeAtom);
 
   /**
    * 設定画面に切り替える
    */
   const toggleSettingScreen = () => {
-    setDisplayMode((displayMode) => displayMode === ScreenMode.taskEditor ? ScreenMode.preference : ScreenMode.taskEditor);    
+    setScreenMode((displayMode) => displayMode === ScreenMode.taskEditor ? ScreenMode.preference : ScreenMode.taskEditor);
   };
 
   return (

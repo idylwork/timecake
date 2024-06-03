@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import Project from '../../models/Project';
-import { ScreenMode, displayModeAtom, projectsAtom } from '../../atoms/dateTaskState';
+import { ScreenMode, screenModeAtom, projectsAtom } from '../../atoms/dateTaskState';
 import styles from './index.module.css'
 
 interface Props {
@@ -16,11 +16,11 @@ interface Props {
 export default function ProjectSelectorPopover({ open, onChange }: Props) {
   /** プロジェクトリスト */
   const projects = useAtomValue(projectsAtom);
-  /** 表示モード */
-  const setDisplayMode = useSetAtom(displayModeAtom);
+  /** 画面表示モード */
+  const setScreenMode = useSetAtom(screenModeAtom);
   /** 有効化されているプロジェクトのみのリスト */
   const availableProjects = useMemo(() => projects.filter((project) => project.isAvailable), [projects]);
-  
+
   /**
    * プロジェクト選択を変更
    * @param event
@@ -35,7 +35,7 @@ export default function ProjectSelectorPopover({ open, onChange }: Props) {
    * プロジェクト設定を選択
    */
   const handleSettingClick = () => {
-    setDisplayMode(ScreenMode.projectSetting);
+    setScreenMode(ScreenMode.projectSetting);
   };
 
   // 開いた状態でどこかをクリックすると閉じる
@@ -64,7 +64,7 @@ export default function ProjectSelectorPopover({ open, onChange }: Props) {
               type="button"
               className={styles.listItem}
               data-project-index={index}
-              onClick={handleProjectClick}                
+              onClick={handleProjectClick}
               key={project.id}
             >
               <div className={styles.badge} style={{ backgroundColor: project.color.toString() }}></div>
