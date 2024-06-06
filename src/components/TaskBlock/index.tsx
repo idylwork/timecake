@@ -1,16 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useAtomValue } from 'jotai';
-import classNames from 'classnames';
-import styles from './index.module.css';
-import Task from '../../models/Task';
-import { minuteStepAtom, projectsAtom, taskBodyLogsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
-import { floorNumberUnit } from '../../utils/number';
-import Project from '../../models/Project';
-import VerticalDraggableArea from '../VerticalDraggableArea';
-import ProjectSelectorPopover from '../ProjectSelectorPopover';
-import { PIXEL_PER_MINUTE } from '../../constants';
 import { TrashIcon } from '@radix-ui/react-icons';
-
+import classNames from 'classnames';
+import { useAtomValue } from 'jotai';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { minuteStepAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { PIXEL_PER_MINUTE } from '../../constants';
+import Project from '../../models/Project';
+import Task from '../../models/Task';
+import { floorNumberUnit } from '../../utils/number';
+import ProjectSelectorPopover from '../ProjectSelectorPopover';
+import VerticalDraggableArea from '../VerticalDraggableArea';
+import styles from './index.module.css';
 
 interface Props {
   task: Task;
@@ -31,13 +30,13 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   /** 編集可能か */
   const [isEditable, setIsEditable] = useState(task.body === '');
   /** 対応時間(分) */
-  const minutes = useMemo(() => task.minutes, [task.startAt, task.endAt])
+  const minutes = useMemo(() => task.minutes, [task.startAt, task.endAt]);
   /** ドラッグで移動するタスク期間(分) */
   const [movingMinutes, setMovingMinutes] = useState(0);
   /** ドラッグで増加するタスク期間(分) */
   const [resizingMinutes, setResizingMinutes] = useState(0);
   /** タスクの所属するプロジェクト */
-  const project = useMemo(() => task.projectFrom(projects), [task.projectId, projects])
+  const project = useMemo(() => task.projectFrom(projects), [task.projectId, projects]);
   /** プロジェクトを選択中か */
   const [isProjectEditing, setIsProjectEditing] = useState(false);
   /** 内容入力フォームの参照 */
@@ -64,7 +63,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
     event.preventDefault();
     setIsEditable(false);
     onChange(new Task({ ...task, body }));
-  }
+  };
 
   /**
    * プロジェクト選択を変更
@@ -74,7 +73,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
     setIsProjectEditing(false);
     if (!project) return;
     onChange(new Task({ ...task, projectId: project.id }));
-  }
+  };
 
   /**
    * 内容入力時の処理
@@ -90,7 +89,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
    */
   const handleMove = (y: number) => {
     const startAt = task.startAt.valueOf();
-    setMovingMinutes(floorNumberUnit(startAt + (-y / PIXEL_PER_MINUTE), minuteStep) - startAt);
+    setMovingMinutes(floorNumberUnit(startAt + -y / PIXEL_PER_MINUTE, minuteStep) - startAt);
   };
 
   /**
@@ -102,7 +101,13 @@ export const TaskBlock = ({ task, onChange }: Props) => {
       fixedMovingMinutes = movingMinutes;
       return 0;
     });
-    onChange(new Task({ ...task, startAt: task.startAt.toAdded(fixedMovingMinutes), endAt: task.endAt.toAdded(fixedMovingMinutes) }));
+    onChange(
+      new Task({
+        ...task,
+        startAt: task.startAt.toAdded(fixedMovingMinutes),
+        endAt: task.endAt.toAdded(fixedMovingMinutes),
+      })
+    );
   };
 
   /**
@@ -130,7 +135,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
 
   useEffect(() => {
     if (!isEditable || !inputRef.current) return;
-    inputRef.current.focus()
+    inputRef.current.focus();
   }, [isEditable]);
 
   return (
@@ -143,7 +148,12 @@ export const TaskBlock = ({ task, onChange }: Props) => {
         opacity: movingMinutes !== 0 ? 0.9 : undefined,
       }}
     >
-      <VerticalDraggableArea onDragging={handleMove} onDragEnd={handleMoveEnd} className={classNames(styles.block, (project?.color.isDark ?? false) && styles.isDark, isSmallSize && styles.isSmall)} style={{ backgroundColor: project?.color.toString() ?? '#dddddd' }}>
+      <VerticalDraggableArea
+        onDragging={handleMove}
+        onDragEnd={handleMoveEnd}
+        className={classNames(styles.block, (project?.color.isDark ?? false) && styles.isDark, isSmallSize && styles.isSmall)}
+        style={{ backgroundColor: project?.color.toString() ?? '#dddddd' }}
+      >
         <div className={styles.container}>
           <div className={styles.content}>
             <div className={styles.row}>
@@ -151,7 +161,9 @@ export const TaskBlock = ({ task, onChange }: Props) => {
                 {`${task.startAt} - ${task.endAt.toAdded(resizingMinutes)}`} ({`${(minutes + resizingMinutes) / 60}`}h)
               </time>
               <ProjectSelectorPopover open={isProjectEditing} onChange={handleProjectChange} />
-              <button type="button" className={styles.project} onClick={() => setIsProjectEditing(true)}>{project?.name ?? '-'}</button>
+              <button type="button" className={styles.project} onClick={() => setIsProjectEditing(true)}>
+                {project?.name ?? '-'}
+              </button>
             </div>
             {isEditable ? (
               <form className={styles.form} onSubmit={endEdit}>
@@ -161,12 +173,14 @@ export const TaskBlock = ({ task, onChange }: Props) => {
                 </button>
               </form>
             ) : (
-              <div className={styles.body} onClick={startEdit}>{task.body.split(taskSeparator).map((bodyItem, index) => (
-                <span key={index}>
-                  {index > 0 && <span className={styles.separator}>{taskSeparator}</span>}
-                  {bodyItem}
-                </span>
-              ))}</div>
+              <div className={styles.body} onClick={startEdit}>
+                {task.body.split(taskSeparator).map((bodyItem, index) => (
+                  <span key={index}>
+                    {index > 0 && <span className={styles.separator}>{taskSeparator}</span>}
+                    {bodyItem}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
           <VerticalDraggableArea className={styles.resizeHandle} onDragging={handleResize} onDragEnd={handleResizeEnd} />

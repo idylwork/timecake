@@ -28,7 +28,5 @@ export function CharactorInput({ value, setValue }: Props) {
     setValue(event.currentTarget.value.at(-1) ?? '');
   };
 
-  return (
-    <input type="text" className={styles.root} value={value} onChange={handleChange} onBlur={handleBlur} />
-  );
+  return <input type="text" className={styles.root} value={value} onChange={handleChange} onBlur={handleBlur} />;
 }

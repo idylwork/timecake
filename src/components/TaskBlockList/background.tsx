@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { PIXEL_PER_MINUTE } from '../../constants';
 import Time from '../../models/Time';
 import styles from './background.module.css';
-import { PIXEL_PER_MINUTE } from '../../constants';
 
 interface Props {
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -42,4 +42,4 @@ export default function TaskBlockListBackground({ onClick }: Props) {
       <div className={styles.currentTime} style={{ top: currentTime.valueOf() * PIXEL_PER_MINUTE }} />
     </div>
   );
-};
+}

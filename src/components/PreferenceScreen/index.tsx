@@ -1,13 +1,13 @@
-import { useAtom, useSetAtom } from 'jotai';
-import ScreenLayout, { ScreenActions } from '../ScreenLayout';
-import styles from './index.module.css';
-import { ScreenMode, MinuteStep, screenModeAtom, outputTemplateAtom, taskSeparatorAtom, minuteStepAtom } from '../../atoms/dateTaskState';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { useAtom, useSetAtom } from 'jotai';
+import { useRef } from 'react';
+import { MinuteStep, ScreenMode, minuteStepAtom, outputTemplateAtom, screenModeAtom, storagePathAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import Button from '../Button';
 import { CharactorInput } from '../CharactorInput';
 import HighlightedTextArea from '../HighlightedTextArea';
-import { useRef } from 'react';
 import NavigationTab from '../NavigationTab';
+import ScreenLayout, { ScreenActions } from '../ScreenLayout';
+import styles from './index.module.css';
 
 /**
  * アプリケーション設定画面
@@ -24,6 +24,8 @@ export default function PreferenceScreen() {
   const [minuteStep, setMinuteStep] = useAtom(minuteStepAtom);
   /** 出力用テンプレートテキストエリアの参照 */
   const outputTemplateRef = useRef<HTMLTextAreaElement>(null);
+  /** データ保存先パス */
+  const [storagePath, setStoragePath] = useAtom(storagePathAtom);
 
   /**
    * 出力用テンプレートに文字列を挿入
@@ -47,21 +49,38 @@ export default function PreferenceScreen() {
    * @param event
    */
   const handleMinuteStepChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setMinuteStep(Number(event.currentTarget.value) as MinuteStep)
+    setMinuteStep(Number(event.currentTarget.value) as MinuteStep);
   };
 
   return (
     <ScreenLayout title="アプリケーション設定">
-      <NavigationTab items={{'一般': ScreenMode.preference, 'プロジェクト': ScreenMode.projectSetting }} selection={ScreenMode.preference} onChange={(screenMode) => setScreenMode(screenMode)} />
+      <NavigationTab
+        items={{
+          一般: ScreenMode.preference,
+          プロジェクト: ScreenMode.projectSetting,
+        }}
+        selection={ScreenMode.preference}
+        onChange={(screenMode) => setScreenMode(screenMode)}
+      />
       <label className={styles.label}>
         <div className={styles.heading}>出力用テンプレート</div>
         <HighlightedTextArea value={outputTemplate} setValue={setOutputTemplate} className={styles.textarea} ref={outputTemplateRef} />
         <div className={styles.textareaActions}>
-          <Button size="small" data-text="{{month}}" onClick={handleOutputTemplateButtonClick}>月</Button>
-          <Button size="small" data-text="{{date}}" onClick={handleOutputTemplateButtonClick}>日</Button>
-          <Button size="small" data-text="{{startAt}}" onClick={handleOutputTemplateButtonClick}>開始時刻</Button>
-          <Button size="small" data-text="{{endAt}}" onClick={handleOutputTemplateButtonClick}>開始時刻</Button>
-          <Button size="small" data-text="{{#projects}}\n・{{name}} {{description}} {{hours}}h\n{{/projects}}" onClick={handleOutputTemplateButtonClick}>プロジェクト一覧</Button>
+          <Button size="small" data-text="{{month}}" onClick={handleOutputTemplateButtonClick}>
+            月
+          </Button>
+          <Button size="small" data-text="{{date}}" onClick={handleOutputTemplateButtonClick}>
+            日
+          </Button>
+          <Button size="small" data-text="{{startAt}}" onClick={handleOutputTemplateButtonClick}>
+            開始時刻
+          </Button>
+          <Button size="small" data-text="{{endAt}}" onClick={handleOutputTemplateButtonClick}>
+            開始時刻
+          </Button>
+          <Button size="small" data-text="{{#projects}}\n・{{name}} {{description}} {{hours}}h\n{{/projects}}" onClick={handleOutputTemplateButtonClick}>
+            プロジェクト一覧
+          </Button>
         </div>
         <div className={styles.description}>コピー時の文章形式。プレースホルダは下部ボタンで挿入可能で、実際のタスク内容に変換されます。</div>
       </label>
@@ -76,14 +95,18 @@ export default function PreferenceScreen() {
         <div className={styles.heading}>タスク時間単位</div>
         <select className={styles.select} defaultValue={minuteStep} onChange={handleMinuteStepChange}>
           {MinuteStep.map((minute) => (
-            <option value={minute} key={minute}>{minute}分</option>
+            <option value={minute} key={minute}>
+              {minute}分
+            </option>
           ))}
         </select>
         <div className={styles.description}>タスク時間の最小単位。</div>
       </label>
 
       <ScreenActions>
-        <Button size="large" className={styles.ok} icon={<CheckIcon />} onClick={() => setScreenMode(ScreenMode.taskEditor)}>OK</Button>
+        <Button size="large" className={styles.ok} icon={<CheckIcon />} onClick={() => setScreenMode(ScreenMode.taskEditor)}>
+          OK
+        </Button>
       </ScreenActions>
     </ScreenLayout>
   );

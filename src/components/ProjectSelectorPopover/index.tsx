@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
 import classNames from 'classnames';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect, useMemo } from 'react';
+import { ScreenMode, projectsAtom, screenModeAtom } from '../../atoms/dateTaskState';
 import Project from '../../models/Project';
-import { ScreenMode, screenModeAtom, projectsAtom } from '../../atoms/dateTaskState';
-import styles from './index.module.css'
+import styles from './index.module.css';
 
 interface Props {
   open: boolean;
@@ -51,8 +51,8 @@ export default function ProjectSelectorPopover({ open, onChange }: Props) {
 
     window.addEventListener('click', close, { capture: true });
     return () => {
-      window.removeEventListener('click', close)
-    }
+      window.removeEventListener('click', close);
+    };
   }, [open]);
 
   return (
@@ -60,13 +60,7 @@ export default function ProjectSelectorPopover({ open, onChange }: Props) {
       <dialog open={open} className={classNames(styles.dialog)}>
         <div className={styles.list}>
           {availableProjects.map((project, index) => (
-            <button
-              type="button"
-              className={styles.listItem}
-              data-project-index={index}
-              onClick={handleProjectClick}
-              key={project.id}
-            >
+            <button type="button" className={styles.listItem} data-project-index={index} onClick={handleProjectClick} key={project.id}>
               <div className={styles.badge} style={{ backgroundColor: project.color.toString() }}></div>
               {project.name}
             </button>

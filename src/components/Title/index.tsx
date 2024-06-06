@@ -1,10 +1,10 @@
 import { GearIcon } from '@radix-ui/react-icons';
-import styles from './index.module.css';
-import { ScreenMode, screenModeAtom } from '../../atoms/dateTaskState';
 import { useSetAtom } from 'jotai';
+import { ScreenMode, screenModeAtom } from '../../atoms/dateTaskState';
+import styles from './index.module.css';
 
 interface Props {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 /**
@@ -20,7 +20,7 @@ export default function Title({ children }: Props) {
    * 設定画面に切り替える
    */
   const toggleSettingScreen = () => {
-    setScreenMode((displayMode) => displayMode === ScreenMode.taskEditor ? ScreenMode.preference : ScreenMode.taskEditor);
+    setScreenMode((displayMode) => (displayMode === ScreenMode.taskEditor ? ScreenMode.preference : ScreenMode.taskEditor));
   };
 
   return (

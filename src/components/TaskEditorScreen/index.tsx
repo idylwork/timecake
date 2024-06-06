@@ -1,9 +1,9 @@
 import { useAtom } from 'jotai';
 import { dateTaskAtom } from '../../atoms/dateTaskState';
-import TaskBlockList from '../TaskBlockList';
-import styles from './index.module.css';
 import ActionMenu from '../ActionMenu';
 import ScreenLayout from '../ScreenLayout';
+import TaskBlockList from '../TaskBlockList';
+import styles from './index.module.css';
 
 /**
  * タスク編集画面
@@ -22,4 +22,4 @@ export default function TaskEditorScreen() {
       <time className={styles.time}>{dateTask.hours}h</time>
     </ScreenLayout>
   );
-};
+}

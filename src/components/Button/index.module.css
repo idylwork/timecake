@@ -85,7 +85,7 @@
   border-bottom-right-radius: 0.4rem;
 }
 
-.group > .root:nth-of-type(n+2) {
+.group > .root:nth-of-type(n + 2) {
   border-left: 0.5px solid #00000010;
 }
 

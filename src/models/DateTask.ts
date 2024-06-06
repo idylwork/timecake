@@ -16,11 +16,11 @@ export default class DateTask {
   /** 日付文字列 YYYY-MM-DD */
   date: string;
   /** タスクリスト */
-  tasks: Task[]
+  tasks: Task[];
 
   constructor({ date, tasks = [] }: DateTaskData) {
     this.date = date instanceof Date ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}` : date;
-    this.tasks = tasks[0] instanceof Task ? tasks as Task[] : tasks.map((task) => new Task(task));
+    this.tasks = tasks[0] instanceof Task ? (tasks as Task[]) : tasks.map((task) => new Task(task));
   }
 
   /**
@@ -41,7 +41,7 @@ export default class DateTask {
     return {
       ...this,
       tasks: this.tasks.map((task) => task.toObject()),
-    }
+    };
   }
 
   /**
@@ -73,7 +73,7 @@ export default class DateTask {
   get hours(): number {
     let minutes = 0;
     for (let i = 0; i < this.tasks.length; i += 1) {
-      minutes += this.tasks[i].minutes
+      minutes += this.tasks[i].minutes;
     }
     return floorNumberUnit(minutes / 60, 0.01);
   }
@@ -86,11 +86,11 @@ export default class DateTask {
     const tasksByProject = new Map<string, Task[]>([]);
     this.tasks.forEach((task) => {
       const key = task.projectId ?? '';
-      const tasks = tasksByProject.get(key)
+      const tasks = tasksByProject.get(key);
       if (tasks) {
-        tasksByProject.set(key, [...tasks, task])
+        tasksByProject.set(key, [...tasks, task]);
       } else {
-        tasksByProject.set(key, [task])
+        tasksByProject.set(key, [task]);
       }
     });
     return [...tasksByProject.values()];
@@ -119,41 +119,47 @@ export default class DateTask {
    * 集計する
    * @returns
    */
-  totalize(projects: Project[], { separator = '・', minuteStep = 30 }: { separator?: string, minuteStep?: MinuteStep } = {}) {
+  totalize(projects: Project[], { separator = '・', minuteStep = 30 }: { separator?: string; minuteStep?: MinuteStep } = {}) {
     let startAt: Time | null = null;
     let endAt: Time | null = null;
     let totalHours = 0;
 
-    const projectsTotal = this.tasksByProject().flatMap((tasks) => {
-      const project = projects.find((project) => project.id === tasks[0].projectId);
-      if (!project) {
-        return []
-      }
-
-      /** プロジェクトの合計時間 */
-      let minutes = 0;
-      /** プロジェクトの説明文種類 */
-      let bodySet = new Set();
-      tasks.forEach((task) => {
-        minutes += task.minutes;
-        if (task.body) {
-          task.body.split(separator).forEach((bodyItem) => {
-            bodySet.add(bodyItem);
-          });
+    const projectsTotal = this.tasksByProject()
+      .flatMap((tasks) => {
+        const project = projects.find((project) => project.id === tasks[0].projectId);
+        if (!project) {
+          return [];
         }
-        if (!startAt || task.startAt < startAt) {
-          startAt = task.startAt
-        }
-        if (!endAt || task.endAt > endAt) {
-          endAt = task.endAt
-        }
-      });
 
-      const hours = floorNumberUnit(minutes, minuteStep) / 60;
-      totalHours += hours;
+        /** プロジェクトの合計時間 */
+        let minutes = 0;
+        /** プロジェクトの説明文種類 */
+        let bodySet = new Set();
+        tasks.forEach((task) => {
+          minutes += task.minutes;
+          if (task.body) {
+            task.body.split(separator).forEach((bodyItem) => {
+              bodySet.add(bodyItem);
+            });
+          }
+          if (!startAt || task.startAt < startAt) {
+            startAt = task.startAt;
+          }
+          if (!endAt || task.endAt > endAt) {
+            endAt = task.endAt;
+          }
+        });
 
-      return { name: project.name, hours, description: [...bodySet].join(separator) }
-    }).filter(Boolean);
+        const hours = floorNumberUnit(minutes, minuteStep) / 60;
+        totalHours += hours;
+
+        return {
+          name: project.name,
+          hours,
+          description: [...bodySet].join(separator),
+        };
+      })
+      .filter(Boolean);
 
     return {
       month: this.getMonth(),

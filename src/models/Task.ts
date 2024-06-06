@@ -5,7 +5,7 @@ export interface TaskData {
   body: string;
   projectId?: string | null;
   startAt: Time;
-  endAt: Time | null;    
+  endAt: Time | null;
 }
 
 /**
@@ -20,7 +20,7 @@ export default class Task {
   startAt: Time;
   /** 終了時間 */
   endAt: Time;
-  
+
   constructor({ body, projectId = null, startAt, endAt = null }: TaskData) {
     this.body = body;
     this.projectId = projectId;
@@ -34,7 +34,7 @@ export default class Task {
 
   /** 所要時間 */
   get minutes(): number {
-    return this.endAt.valueOf() - this.startAt.valueOf()
+    return this.endAt.valueOf() - this.startAt.valueOf();
   }
 
   /**
@@ -47,7 +47,7 @@ export default class Task {
 
   /**
    * データをオブジェクト化する
-   * @returns 
+   * @returns
    */
   toObject() {
     return {

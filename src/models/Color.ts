@@ -58,11 +58,15 @@ export default class Color {
     const min = Math.min(this.red, this.green, this.blue);
     const diff = max - min;
 
-    switch(min) {
-      case max: return 0;
-      case this.red: return (60 * ((this.blue - this.green) / diff)) + 180;
-      case this.green: return (60 * ((this.red - this.blue) / diff)) + 300;
-      case this.blue: return (60 * ((this.green - this.red) / diff)) + 60;
+    switch (min) {
+      case max:
+        return 0;
+      case this.red:
+        return 60 * ((this.blue - this.green) / diff) + 180;
+      case this.green:
+        return 60 * ((this.red - this.blue) / diff) + 300;
+      case this.blue:
+        return 60 * ((this.green - this.red) / diff) + 60;
     }
   }
 

@@ -1,8 +1,8 @@
 import { atom } from 'jotai';
 import { focusAtom } from 'jotai-optics';
+import { atomWithStorage, selectAtom } from 'jotai/utils';
 import DateTask, { DateTaskData } from '../models/DateTask';
 import Project, { ProjectData } from '../models/Project';
-import { atomWithStorage, selectAtom } from 'jotai/utils';
 
 const projects: ProjectData[] = [
   { name: 'FvApp', color: '#ddddff' },
@@ -27,7 +27,7 @@ export const projectsAtom = atom(
  */
 const dateTaskDataAtom = atomWithStorage<DateTaskData>('dateTask', {
   date: new Date(),
-  tasks: []
+  tasks: [],
 });
 
 /**
@@ -45,19 +45,23 @@ const dateTaskLogsDataAtom = atomWithStorage<DateTaskData[]>('dataTaskLogs', [])
  */
 export const dateTaskLogsAtom = atom(
   (get) => {
-    return new Map(get(dateTaskLogsDataAtom).map((dateTaskLogData) => {
-      const dateTask = new DateTask(dateTaskLogData);
-      return [dateTask.date, dateTask]
-    }));
+    return new Map(
+      get(dateTaskLogsDataAtom).map((dateTaskLogData) => {
+        const dateTask = new DateTask(dateTaskLogData);
+        return [dateTask.date, dateTask];
+      })
+    );
   },
   (get, set, update: Map<string, DateTask> | DateTask) => {
     // ログの更新
     if (update instanceof DateTask) {
       // DateTask単体が渡されたときは日付から判定して更新する
-      const newDateTaskLogs = new Map(get(dateTaskLogsDataAtom).map((dateTaskLogData) => {
-        const dateTask = new DateTask(dateTaskLogData);
-        return [dateTask.date, dateTask];
-      }));
+      const newDateTaskLogs = new Map(
+        get(dateTaskLogsDataAtom).map((dateTaskLogData) => {
+          const dateTask = new DateTask(dateTaskLogData);
+          return [dateTask.date, dateTask];
+        })
+      );
 
       if (update.tasks.length) {
         newDateTaskLogs.set(update.date, update);
@@ -72,7 +76,10 @@ export const dateTaskLogsAtom = atom(
       update.tasks.forEach((task, index) => {
         priorityMap.set(task.projectId, index);
       });
-      set(projectsAtom, projects.sort((a, b) => (priorityMap.get(b.id) ?? -1) - (priorityMap.get(a.id) ?? -1)));
+      set(
+        projectsAtom,
+        projects.sort((a, b) => (priorityMap.get(b.id) ?? -1) - (priorityMap.get(a.id) ?? -1))
+      );
     } else {
       set(dateTaskLogsDataAtom, [...update.values()]);
     }
@@ -87,7 +94,7 @@ export const ScreenMode = {
   projectSetting: 'projectSetting',
   preference: 'preference',
 } as const;
-export type ScreenMode = typeof ScreenMode[keyof typeof ScreenMode];
+export type ScreenMode = (typeof ScreenMode)[keyof typeof ScreenMode];
 
 /**
  * アプリケーションの表示モードAtom
@@ -99,16 +106,18 @@ export const screenModeAtom = atom<ScreenMode>(ScreenMode.taskEditor);
  */
 export const tasksAtom = focusAtom(dateTaskAtom, (optic) => optic.prop('tasks'));
 
-
 /**
  * 出力テンプレートAtom
  */
-export const outputTemplateAtom = atomWithStorage('outputTemplate', '```\n【日報】{{month}}/{{date}} {{startAt}}-{{endAt}}\n'
-+ '{{#projects}}\n'
-+ '・{{name}} {{description}} {{hours}}h\n'
-+ '{{/projects}}\n'
-+ '＜コメント＞\n'
-+ '```\n');
+export const outputTemplateAtom = atomWithStorage(
+  'outputTemplate',
+  '```\n【日報】{{month}}/{{date}} {{startAt}}-{{endAt}}\n' + '{{#projects}}\n' + '・{{name}} {{description}} {{hours}}h\n' + '{{/projects}}\n' + '＜コメント＞\n' + '```\n'
+);
+
+/**
+ * データ保存先パスAtom
+ */
+export const storagePathAtom = atomWithStorage('storagePath', '');
 
 /**
  * タスク区切り文字
@@ -116,7 +125,7 @@ export const outputTemplateAtom = atomWithStorage('outputTemplate', '```\n【日
 export const taskSeparatorAtom = atomWithStorage('taskSeparator', '・');
 
 export const MinuteStep = [15, 30, 60] as const;
-export type MinuteStep = typeof MinuteStep[number];
+export type MinuteStep = (typeof MinuteStep)[number];
 
 /**
  * タスク時間単位
@@ -128,9 +137,9 @@ export const minuteStepAtom = atomWithStorage<MinuteStep>('minuteStep', 30);
  */
 export const taskBodyLogsAtom = selectAtom(dateTaskLogsAtom, (dateTaskLogs): { [projectId: string]: string[] } => {
   /** @todo 件数が多くなった場合の処理を追加する */
-  const bodySets: { [projectId: string]: Set<string> } = {}
+  const bodySets: { [projectId: string]: Set<string> } = {};
 
-  const dateTasks = [...dateTaskLogs.values()]
+  const dateTasks = [...dateTaskLogs.values()];
   for (let i = 0; i < dateTasks.length; i += 1) {
     const tasks = dateTasks[i].tasks;
     for (let j = 0; j < tasks.length; j += 1) {
@@ -144,12 +153,14 @@ export const taskBodyLogsAtom = selectAtom(dateTaskLogsAtom, (dateTaskLogs): { [
 
   // 最新のタスクから指定のサイズまでの個数をプロジェクト毎に取得する
   const maxCountByProject = 3;
-  return Object.fromEntries(Object.entries(bodySets).map(([projectId, bodySet]) => {
-    const bodies: string[] = [];
-    const bodySetValues = [...bodySet];
-    for (var i = bodySetValues.length - 1; i >= 0 && bodies.length < maxCountByProject ; i--) {
-      bodies.push(bodySetValues[i]);
-    }
-    return [projectId, bodies];
-  }));
+  return Object.fromEntries(
+    Object.entries(bodySets).map(([projectId, bodySet]) => {
+      const bodies: string[] = [];
+      const bodySetValues = [...bodySet];
+      for (var i = bodySetValues.length - 1; i >= 0 && bodies.length < maxCountByProject; i--) {
+        bodies.push(bodySetValues[i]);
+      }
+      return [projectId, bodies];
+    })
+  );
 });

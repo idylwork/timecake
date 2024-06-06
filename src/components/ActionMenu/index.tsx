@@ -1,13 +1,13 @@
+import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, Cross2Icon, PinBottomIcon } from '@radix-ui/react-icons';
 import { useAtom, useAtomValue } from 'jotai';
 import { dateTaskAtom, dateTaskLogsAtom, minuteStepAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import DateTask from '../../models/DateTask';
-import { replaceMustache } from '../../utils/string';
-import styles from './index.module.css';
-import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, Cross2Icon, PinBottomIcon } from '@radix-ui/react-icons';
-import Button, { ButtonGroup } from '../Button';
-import Time from '../../models/Time';
 import Task from '../../models/Task';
+import Time from '../../models/Time';
 import { floorNumberUnit } from '../../utils/number';
+import { replaceMustache } from '../../utils/string';
+import Button, { ButtonGroup } from '../Button';
+import styles from './index.module.css';
 
 /**
  * タスクに関する操作ボタン
@@ -57,18 +57,29 @@ export default function ActionMenu() {
     const [currentTask] = newTasks.splice(-1, 1);
     if (!currentTask) return;
 
-    const now = new Time(floorNumberUnit((new Time()).valueOf(), minuteStep));
+    const now = new Time(floorNumberUnit(new Time().valueOf(), minuteStep));
     if (currentTask.endAt >= now) return;
 
-    setDateTask(new DateTask({ date: dateTask.date, tasks: [...newTasks, new Task({ ...currentTask, endAt: now })] }));
-  }
+    setDateTask(
+      new DateTask({
+        date: dateTask.date,
+        tasks: [...newTasks, new Task({ ...currentTask, endAt: now })],
+      })
+    );
+  };
 
   /**
    * 出力
    */
   const output = () => {
-    const debugDateTask = new DateTask({ date: new Date(), tasks: dateTask.tasks });
-    const total = debugDateTask.totalize(projects, { separator: taskSeparator, minuteStep: minuteStep });
+    const debugDateTask = new DateTask({
+      date: new Date(),
+      tasks: dateTask.tasks,
+    });
+    const total = debugDateTask.totalize(projects, {
+      separator: taskSeparator,
+      minuteStep: minuteStep,
+    });
     const text = replaceMustache(outputTemplate, total);
     console.info(text);
     navigator.clipboard.writeText(text);
@@ -78,12 +89,20 @@ export default function ActionMenu() {
     <section className={styles.root} data-tauri-drag-region="default">
       <ButtonGroup>
         <Button size="small" icon={<ChevronLeftIcon />} onClick={() => moveDate(-1)}></Button>
-        <Button size="small" onClick={() => moveDate()}>今日</Button>
+        <Button size="small" onClick={() => moveDate()}>
+          今日
+        </Button>
         <Button size="small" icon={<ChevronRightIcon />} onClick={() => moveDate(1)}></Button>
       </ButtonGroup>
-      <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>クリア</Button>
-      <Button size="small" icon={<CopyIcon />} complete="Copied!" onClick={output}>コピー</Button>
-      <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillCurrentTask}>延長</Button>
+      <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>
+        クリア
+      </Button>
+      <Button size="small" icon={<CopyIcon />} complete="Copied!" onClick={output}>
+        コピー
+      </Button>
+      <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillCurrentTask}>
+        延長
+      </Button>
     </section>
   );
 }

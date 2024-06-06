@@ -7,7 +7,7 @@ interface Props {
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
-};
+}
 
 /**
  * 縦方向のドラッグを検知するエリア
@@ -29,7 +29,7 @@ export default function VerticalDraggableArea({ onDragStart, onDragging, onDragE
       case 'INPUT':
       case 'SELECT':
         // 入力フォームはドラッグ対象外とする
-        return
+        return;
       default:
         event.stopPropagation();
         if (onDragStart) {
@@ -40,7 +40,7 @@ export default function VerticalDraggableArea({ onDragStart, onDragging, onDragE
   };
 
   useEffect(() => {
-    if (dragStartingY === null) return
+    if (dragStartingY === null) return;
 
     /**
      * ドラッグ中の処理
@@ -48,7 +48,7 @@ export default function VerticalDraggableArea({ onDragStart, onDragging, onDragE
      */
     const handleDrag = (event: MouseEvent) => {
       event.preventDefault();
-      onDragging(dragStartingY - event.screenY)
+      onDragging(dragStartingY - event.screenY);
     };
 
     /**
@@ -63,12 +63,10 @@ export default function VerticalDraggableArea({ onDragStart, onDragging, onDragE
     window.addEventListener('mousemove', handleDrag);
     window.addEventListener('mouseup', handleDragEnd, { once: true });
     return () => {
-      window.removeEventListener('mousemove', handleDrag)
+      window.removeEventListener('mousemove', handleDrag);
       window.removeEventListener('mouseup', handleDragEnd);
-    }
-  }, [dragStartingY])
+    };
+  }, [dragStartingY]);
 
-  return (
-    <div {...props} onMouseDown={handleDragStart} />
-  );
-};
+  return <div {...props} onMouseDown={handleDragStart} />;
+}

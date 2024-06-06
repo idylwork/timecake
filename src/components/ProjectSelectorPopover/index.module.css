@@ -1,40 +1,40 @@
 .root {
-    position: relative;
-    z-index: 1000;
-    display: inline-block;
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
 }
 
 .dialog {
-    border-radius: 0.3rem;
-    box-shadow: 0 4px 10px #00000020;
+  border-radius: 0.3rem;
+  box-shadow: 0 4px 10px #00000020;
 }
 
 .list {
-    display: flex;
-    flex-direction: column;
-    min-width: 10rem;
-    max-height: 15rem;
-    overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+  max-height: 15rem;
+  overflow-y: scroll;
 }
 
 .listItem {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    font-size: 0.8rem;
-    text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  text-align: left;
 }
 
 .badge {
-    flex-shrink: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 7px;
+  flex-shrink: 0;
+  height: 14px;
+  width: 14px;
+  border-radius: 7px;
 }
 
 .separator {
-    width: calc(100% - 0.8rem);
-    height: 0.9px;
-    background: #cccccc;
-    margin: auto;
+  width: calc(100% - 0.8rem);
+  height: 0.9px;
+  background: #cccccc;
+  margin: auto;
 }

@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import classNames from 'classnames';
+import { useState } from 'react';
 import styles from './index.module.css';
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
@@ -30,14 +30,12 @@ export default function Button({ icon = null, size = 'middle', complete = '', cl
     setIsComplete(true);
     setTimeout(() => {
       setIsComplete(false);
-    }, 1000)
+    }, 1000);
   };
 
   return (
     <button type="button" className={classNames(styles.root, styles[size], className)} onClick={handleClick} {...props}>
-      {icon && (
-        <div className={styles.icon}>{icon}</div>
-      )}
+      {icon && <div className={styles.icon}>{icon}</div>}
       {children}
       {complete && <div className={classNames(styles.complete, isComplete && styles.isComplete)}>{complete}</div>}
     </button>
@@ -54,9 +52,5 @@ interface GroupProps {
  * @returns
  */
 export function ButtonGroup({ children }: GroupProps) {
-  return (
-    <div className={styles.group}>
-      {children}
-    </div>
-  );
+  return <div className={styles.group}>{children}</div>;
 }

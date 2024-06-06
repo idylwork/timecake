@@ -34,6 +34,6 @@ function NavigationTab<T>({ items, selection, onChange }: Props<T>) {
       ))}
     </div>
   );
-};
+}
 
 export default React.memo(NavigationTab) as typeof NavigationTab;

@@ -95,7 +95,7 @@
 }
 
 .highlightBox::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   display: inline-block;
@@ -116,7 +116,7 @@
 }
 
 .highlightSectionStart::before {
-  content: "▽";
+  content: '▽';
   position: absolute;
   font-size: 0.5em;
   margin-left: 0.8em;
@@ -132,7 +132,7 @@
 }
 
 .highlightSectionEnd::before {
-  content: "△";
+  content: '△';
   position: absolute;
   font-size: 0.5em;
   margin-left: 0.8em;

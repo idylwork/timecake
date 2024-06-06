@@ -17,9 +17,7 @@ export default function ScreenLayout({ title, padding = true, children }: Props)
   return (
     <div className={styles.root}>
       <Title>{title}</Title>
-      <main className={classNames(styles.main, padding && styles.padding)}>
-        {children}
-      </main>
+      <main className={classNames(styles.main, padding && styles.padding)}>{children}</main>
     </div>
   );
 }
@@ -32,9 +30,7 @@ export default function ScreenLayout({ title, padding = true, children }: Props)
 export function ScreenActions({ children }: { children?: React.ReactNode }) {
   return (
     <div className={styles.actions}>
-      <div className={styles.actionsContainer}>
-        {children}
-      </div>
+      <div className={styles.actionsContainer}>{children}</div>
     </div>
   );
 }

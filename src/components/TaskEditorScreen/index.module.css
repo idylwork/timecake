@@ -1,22 +1,22 @@
 .root {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  height: 100vh;
 }
 
 .header {
-    border-bottom: 0.9px solid;
-    border-bottom-color: var(--muted-color);
+  border-bottom: 0.9px solid;
+  border-bottom-color: var(--muted-color);
 }
 
 .time {
-    position: absolute;
-    bottom: 0;
-    right: 1rem;
-    font-size: 2rem;
-    font-weight: 900;
-    font-style: italic;
-    color: #99999940;
-    pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  right: 1rem;
+  font-size: 2rem;
+  font-weight: 900;
+  font-style: italic;
+  color: #99999940;
+  pointer-events: none;
 }
