@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { focusAtom } from 'jotai-optics';
-import { atomWithStorage, selectAtom } from 'jotai/utils';
+import { atomWithStorage } from 'jotai/utils';
 import DateTask, { DateTaskData } from '../models/DateTask';
 import Project, { ProjectData } from '../models/Project';
 
@@ -135,8 +135,12 @@ export const minuteStepAtom = atomWithStorage<MinuteStep>('minuteStep', 30);
 /**
  * プロジェクトID毎のタスク名Atom
  */
-export const taskBodyLogsAtom = selectAtom(dateTaskLogsAtom, (dateTaskLogs): { [projectId: string]: string[] } => {
+export const taskBodyLogsAtom = atom((get) => {
   /** @todo 件数が多くなった場合の処理を追加する */
+
+  const dateTaskLogs = get(dateTaskLogsAtom);
+  const taskSeparator = get(taskSeparatorAtom);
+
   const bodySets: { [projectId: string]: Set<string> } = {};
 
   const dateTasks = [...dateTaskLogs.values()];
@@ -146,7 +150,9 @@ export const taskBodyLogsAtom = selectAtom(dateTaskLogsAtom, (dateTaskLogs): { [
       const task = tasks[j];
       if (!task.projectId || !task.body) continue;
       const bodySet = bodySets[task.projectId] ?? new Set();
-      bodySet.add(task.body);
+      task.body.split(taskSeparator).forEach((body) => {
+        bodySet.add(body);
+      });
       bodySets[task.projectId] = bodySet;
     }
   }

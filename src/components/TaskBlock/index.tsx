@@ -7,6 +7,7 @@ import { PIXEL_PER_MINUTE } from '../../constants';
 import Project from '../../models/Project';
 import Task from '../../models/Task';
 import { floorNumberUnit } from '../../utils/number';
+import AutoCompleteSelect from '../AutoCompleteSelect';
 import ProjectSelectorPopover from '../ProjectSelectorPopover';
 import VerticalDraggableArea from '../VerticalDraggableArea';
 import styles from './index.module.css';
@@ -29,6 +30,8 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   const [body, setBody] = useState('');
   /** 編集可能か */
   const [isEditable, setIsEditable] = useState(task.body === '');
+  /** 内容のオートコンプリートを表示するか */
+  const [isAutoCompletePresented, setIsAutoCompletePresented] = useState(false);
   /** 対応時間(分) */
   const minutes = useMemo(() => task.minutes, [task.startAt, task.endAt]);
   /** ドラッグで移動するタスク期間(分) */
@@ -54,6 +57,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   const startEdit = () => {
     setBody(task.body);
     setIsEditable(true);
+    setIsAutoCompletePresented(task.body === '');
   };
 
   /**
@@ -61,8 +65,9 @@ export const TaskBlock = ({ task, onChange }: Props) => {
    */
   const endEdit = (event: React.FormEvent) => {
     event.preventDefault();
+    setIsAutoCompletePresented(false);
     setIsEditable(false);
-    onChange(new Task({ ...task, body }));
+    onChange(new Task({ ...task, body: body }));
   };
 
   /**
@@ -80,6 +85,8 @@ export const TaskBlock = ({ task, onChange }: Props) => {
    * @param event
    */
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newBody = event.currentTarget.value;
+    setIsAutoCompletePresented(newBody === '');
     setBody(event.currentTarget.value);
   };
 
@@ -101,6 +108,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
       fixedMovingMinutes = movingMinutes;
       return 0;
     });
+    if (fixedMovingMinutes === 0) return;
     onChange(
       new Task({
         ...task,
@@ -144,7 +152,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
       style={{
         height: `${(minutes + resizingMinutes) * PIXEL_PER_MINUTE}px`,
         top: `${(task.startAt.valueOf() + movingMinutes) * PIXEL_PER_MINUTE}px`,
-        zIndex: isProjectEditing || movingMinutes !== 0 ? 3 : undefined,
+        zIndex: isEditable || isProjectEditing || movingMinutes !== 0 ? 3 : undefined,
         opacity: movingMinutes !== 0 ? 0.9 : undefined,
       }}
     >
@@ -167,13 +175,15 @@ export const TaskBlock = ({ task, onChange }: Props) => {
             </div>
             {isEditable ? (
               <form className={styles.form} onSubmit={endEdit}>
-                <input ref={inputRef} type="text" className={styles.body} value={body} onChange={handleBodyChange} onBlur={endEdit} />
+                <AutoCompleteSelect projectId={project?.id} open={isAutoCompletePresented} onChange={(newBody) => setBody(newBody)} className={styles.body}>
+                  <input ref={inputRef} type="text" className={styles.bodyInput} value={body} onChange={handleBodyChange} onBlur={endEdit} />
+                </AutoCompleteSelect>
                 <button type="button" className={styles.button} onMouseDown={() => onChange(null)}>
                   <TrashIcon />
                 </button>
               </form>
             ) : (
-              <div className={styles.body} onClick={startEdit}>
+              <div className={classNames(styles.body, styles.bodyText)} onClick={startEdit}>
                 {task.body.split(taskSeparator).map((bodyItem, index) => (
                   <span key={index}>
                     {index > 0 && <span className={styles.separator}>{taskSeparator}</span>}

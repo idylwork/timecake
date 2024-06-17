@@ -14,7 +14,7 @@ export default function TaskEditorScreen() {
   const [dateTask] = useAtom(dateTaskAtom);
 
   return (
-    <ScreenLayout title={`${dateTask.getMonth()}/${dateTask.getDate()}`} padding={false}>
+    <ScreenLayout title={`${dateTask.getMonth()}/${dateTask.getDate()} (${dateTask.getWeekday()})`} padding={false}>
       <div className={styles.header}>
         <ActionMenu />
       </div>

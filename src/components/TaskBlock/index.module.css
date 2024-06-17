@@ -4,6 +4,9 @@
   padding: 0.1rem 0 0.05rem;
   box-sizing: border-box;
   z-index: 2;
+  transition:
+    top 0.05s,
+    height 0.05s;
 }
 
 .block {
@@ -41,10 +44,8 @@
 
 .body {
   width: 100%;
-  min-height: 1.5em;
+  min-height: 1.6em;
   font-size: 0.8rem;
-  padding: 0;
-  overflow: hidden;
   cursor: text;
 }
 
@@ -53,6 +54,12 @@
 }
 .body:focus {
   background: #cccccc30;
+}
+.bodyInput {
+  width: 100%;
+}
+.bodyText {
+  overflow: hidden;
 }
 
 .separator {

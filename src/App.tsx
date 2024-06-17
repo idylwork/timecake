@@ -1,6 +1,5 @@
 import { DndContext } from '@dnd-kit/core';
 import { Cross2Icon, MinusIcon } from '@radix-ui/react-icons';
-import { invoke } from '@tauri-apps/api/tauri';
 import { appWindow } from '@tauri-apps/api/window';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
@@ -34,7 +33,6 @@ export default function App() {
   const screenMode = useAtomValue(screenModeAtom);
   /** アプリウィンドウがフォーカスされているか */
   const isWindowFocused = useWindowFocused();
-
 
   return (
     <DndContext>

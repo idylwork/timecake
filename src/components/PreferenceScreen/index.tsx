@@ -1,7 +1,7 @@
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useAtom, useSetAtom } from 'jotai';
 import { useRef } from 'react';
-import { MinuteStep, ScreenMode, minuteStepAtom, outputTemplateAtom, screenModeAtom, storagePathAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { MinuteStep, ScreenMode, minuteStepAtom, outputTemplateAtom, screenModeAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
 import Button from '../Button';
 import { CharactorInput } from '../CharactorInput';
 import HighlightedTextArea from '../HighlightedTextArea';
@@ -24,8 +24,6 @@ export default function PreferenceScreen() {
   const [minuteStep, setMinuteStep] = useAtom(minuteStepAtom);
   /** 出力用テンプレートテキストエリアの参照 */
   const outputTemplateRef = useRef<HTMLTextAreaElement>(null);
-  /** データ保存先パス */
-  const [storagePath, setStoragePath] = useAtom(storagePathAtom);
 
   /**
    * 出力用テンプレートに文字列を挿入

@@ -17,9 +17,12 @@ export default class DateTask {
   date: string;
   /** タスクリスト */
   tasks: Task[];
+  /** 日付 */
+  #date: Date;
 
   constructor({ date, tasks = [] }: DateTaskData) {
     this.date = date instanceof Date ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}` : date;
+    this.#date = date instanceof Date ? date : new Date(date);
     this.tasks = tasks[0] instanceof Task ? (tasks as Task[]) : tasks.map((task) => new Task(task));
   }
 
@@ -46,6 +49,7 @@ export default class DateTask {
 
   /**
    * 年を取得する
+   * @returns
    */
   getYear() {
     return Number(this.date.split('-')[0]);
@@ -53,6 +57,7 @@ export default class DateTask {
 
   /**
    * 月を取得する
+   * @returns
    */
   getMonth() {
     return Number(this.date.split('-')[1]);
@@ -60,9 +65,18 @@ export default class DateTask {
 
   /**
    * 日を取得する
+   * @returns
    */
   getDate() {
     return Number(this.date.split('-')[2]);
+  }
+
+  /**
+   * 曜日を取得する
+   * @returns
+   */
+  getWeekday() {
+    return this.#date.toLocaleDateString('ja-JP', { weekday: 'short' });
   }
 
   /**

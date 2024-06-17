@@ -69,14 +69,10 @@ export default function ActionMenu() {
   };
 
   /**
-   * 出力
+   * クリップボードにコピー
    */
-  const output = () => {
-    const debugDateTask = new DateTask({
-      date: new Date(),
-      tasks: dateTask.tasks,
-    });
-    const total = debugDateTask.totalize(projects, {
+  const copyToClipboard = () => {
+    const total = dateTask.totalize(projects, {
       separator: taskSeparator,
       minuteStep: minuteStep,
     });
@@ -97,7 +93,7 @@ export default function ActionMenu() {
       <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>
         クリア
       </Button>
-      <Button size="small" icon={<CopyIcon />} complete="Copied!" onClick={output}>
+      <Button size="small" icon={<CopyIcon />} complete="Copied!" onClick={copyToClipboard}>
         コピー
       </Button>
       <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillCurrentTask}>

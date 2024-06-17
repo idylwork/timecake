@@ -1,0 +1,22 @@
+.root {
+  position: relative;
+  flex-grow: 1;
+}
+
+.dialog {
+  top: 100%;
+  width: 100%;
+  font-size: 0.6rem;
+  color: var(--text-color);
+  background: var(--background-color);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.2rem;
+  box-shadow: 0 3px 6px #00000020;
+}
+
+.item {
+  cursor: pointer;
+}
+.item:hover {
+  background: #cccccc30;
+}
