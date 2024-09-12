@@ -5,6 +5,22 @@
   height: 100vh;
 }
 
+.title {
+  position: relative;
+}
+
+.isChanged::before {
+  content: '';
+  position: absolute;
+  top: 0.6rem;
+  display: inline-block;
+  width: 0.25rem;
+  height: 0.25rem;
+  background: var(--muted-color);
+  border-radius: 5px;
+  transform: translateX(-0.5rem);
+}
+
 .header {
   border-bottom: 0.9px solid;
   border-bottom-color: var(--muted-color);

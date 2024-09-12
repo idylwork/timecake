@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import styles from './index.module.css';
 
-interface Props extends React.HTMLAttributes<HTMLButtonElement> {
+interface Props extends React.ComponentPropsWithoutRef<'button'> {
   size?: 'small' | 'middle' | 'large';
   icon?: React.ReactNode;
   complete?: string;

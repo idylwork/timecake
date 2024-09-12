@@ -1,0 +1,12 @@
+.root {
+  font-size: 0.6rem;
+  text-align: left;
+  border: 0.9px solid #cccccc;
+  border-radius: 0.2rem;
+  width: 100%;
+  transition: 0.2s background-color;
+}
+
+.inProgress {
+  background-color: #cccccc50;
+}

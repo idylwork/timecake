@@ -4,6 +4,7 @@ import styles from './index.module.css';
 
 interface Props {
   title: string;
+  titleClassName?: string;
   padding?: boolean;
   children: React.ReactNode;
 }
@@ -13,10 +14,10 @@ interface Props {
  * @param props.title - タイトル
  * @return
  */
-export default function ScreenLayout({ title, padding = true, children }: Props) {
+export default function ScreenLayout({ title, padding = true, titleClassName, children }: Props) {
   return (
     <div className={styles.root}>
-      <Title>{title}</Title>
+      <Title className={titleClassName}>{title}</Title>
       <main className={classNames(styles.main, padding && styles.padding)}>{children}</main>
     </div>
   );

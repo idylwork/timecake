@@ -1,8 +1,9 @@
-import { TrashIcon } from '@radix-ui/react-icons';
+import { Cross1Icon } from '@radix-ui/react-icons';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { minuteStepAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { minuteStepAtom, taskSeparatorAtom } from '../../atoms/preferenceAtom';
+import { projectsAtom, useSortProjects } from '../../atoms/projectsAtom';
 import { PIXEL_PER_MINUTE } from '../../constants';
 import Project from '../../models/Project';
 import Task from '../../models/Task';
@@ -50,6 +51,8 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   const taskSeparator = useAtomValue(taskSeparatorAtom);
   /** タスク時間単位 */
   const minuteStep = useAtomValue(minuteStepAtom);
+  /** プロジェクトリストを並べ替える */
+  const sortProjects = useSortProjects();
 
   /**
    * 編集開始
@@ -67,7 +70,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
     event.preventDefault();
     setIsAutoCompletePresented(false);
     setIsEditable(false);
-    onChange(new Task({ ...task, body: body }));
+    onChange(new Task({ ...task, body }));
   };
 
   /**
@@ -78,6 +81,9 @@ export const TaskBlock = ({ task, onChange }: Props) => {
     setIsProjectEditing(false);
     if (!project) return;
     onChange(new Task({ ...task, projectId: project.id }));
+
+    // 選択したプロジェクトを最前にソート
+    sortProjects(project.id);
   };
 
   /**
@@ -138,7 +144,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
       fixedResizingMinutes = resizingMinutes;
       return 0;
     });
-    onChange(new Task({ ...task, endAt: task.endAt.toAdded(fixedResizingMinutes) }));
+    onChange(new Task({ ...task, body, endAt: task.endAt.toAdded(fixedResizingMinutes) }));
   };
 
   useEffect(() => {
@@ -152,14 +158,19 @@ export const TaskBlock = ({ task, onChange }: Props) => {
       style={{
         height: `${(minutes + resizingMinutes) * PIXEL_PER_MINUTE}px`,
         top: `${(task.startAt.valueOf() + movingMinutes) * PIXEL_PER_MINUTE}px`,
-        zIndex: isEditable || isProjectEditing || movingMinutes !== 0 ? 3 : undefined,
+        zIndex: isProjectEditing || isAutoCompletePresented || movingMinutes !== 0 ? 3 : undefined,
         opacity: movingMinutes !== 0 ? 0.9 : undefined,
       }}
     >
       <VerticalDraggableArea
         onDragging={handleMove}
         onDragEnd={handleMoveEnd}
-        className={classNames(styles.block, (project?.color.isDark ?? false) && styles.isDark, isSmallSize && styles.isSmall)}
+        className={classNames(
+          styles.block,
+          (project?.color.isDark ?? false) && styles.isDark,
+          isSmallSize && styles.isSmall,
+          !isEditable && styles.isClosable
+        )}
         style={{ backgroundColor: project?.color.toString() ?? '#dddddd' }}
       >
         <div className={styles.container}>
@@ -172,15 +183,21 @@ export const TaskBlock = ({ task, onChange }: Props) => {
               <button type="button" className={styles.project} onClick={() => setIsProjectEditing(true)}>
                 {project?.name ?? '-'}
               </button>
+              <button type="button" className={styles.close} onClick={() => onChange(null)}>
+                <Cross1Icon />
+              </button>
             </div>
             {isEditable ? (
               <form className={styles.form} onSubmit={endEdit}>
-                <AutoCompleteSelect projectId={project?.id} open={isAutoCompletePresented} onChange={(newBody) => setBody(newBody)} className={styles.body}>
+                <AutoCompleteSelect
+                  projectId={project?.id}
+                  open={isAutoCompletePresented}
+                  onChange={(newBody) => setBody(newBody)}
+                  onFocus={() => setIsAutoCompletePresented(!isAutoCompletePresented)}
+                  className={styles.body}
+                >
                   <input ref={inputRef} type="text" className={styles.bodyInput} value={body} onChange={handleBodyChange} onBlur={endEdit} />
                 </AutoCompleteSelect>
-                <button type="button" className={styles.button} onMouseDown={() => onChange(null)}>
-                  <TrashIcon />
-                </button>
               </form>
             ) : (
               <div className={classNames(styles.body, styles.bodyText)} onClick={startEdit}>

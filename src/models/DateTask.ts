@@ -1,4 +1,5 @@
-import { MinuteStep } from '../atoms/dateTaskState';
+import { MinuteStep } from '../atoms/preferenceAtom';
+import { dateToString } from '../utils/Date';
 import { floorNumberUnit } from '../utils/number';
 import Project from './Project';
 import Task, { TaskData as TaskProps } from './Task';
@@ -20,8 +21,9 @@ export default class DateTask {
   /** 日付 */
   #date: Date;
 
-  constructor({ date, tasks = [] }: DateTaskData) {
-    this.date = date instanceof Date ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}` : date;
+  constructor({ date = new Date(), tasks = [] }: DateTaskData) {
+    // インスタンスとデータのどちらも受け取れるようにする
+    this.date = date instanceof Date ? dateToString(date) : date;
     this.#date = date instanceof Date ? date : new Date(date);
     this.tasks = tasks[0] instanceof Task ? (tasks as Task[]) : tasks.map((task) => new Task(task));
   }
@@ -48,8 +50,24 @@ export default class DateTask {
   }
 
   /**
-   * 年を取得する
+   * データ保存用のJSON文字列に変換する
    * @returns
+   */
+  toJSON() {
+    return JSON.stringify(this.toObject());
+  }
+
+  /**
+   * Dateインスタンスを取得
+   * @returns
+   */
+  getDateInstance() {
+    return this.#date;
+  }
+
+  /**
+   * 年を取得する
+   * @returns 1900〜
    */
   getYear() {
     return Number(this.date.split('-')[0]);
@@ -57,7 +75,7 @@ export default class DateTask {
 
   /**
    * 月を取得する
-   * @returns
+   * @returns 1〜12
    */
   getMonth() {
     return Number(this.date.split('-')[1]);
@@ -65,7 +83,7 @@ export default class DateTask {
 
   /**
    * 日を取得する
-   * @returns
+   * @returns 1〜31
    */
   getDate() {
     return Number(this.date.split('-')[2]);
@@ -77,6 +95,15 @@ export default class DateTask {
    */
   getWeekday() {
     return this.#date.toLocaleDateString('ja-JP', { weekday: 'short' });
+  }
+
+  /**
+   * 対応するログファイル名
+   * @param dir - sディレクトリ
+   * @returns
+   */
+  getLogFileName(dir = '') {
+    return `${dir}/${this.date.substring(0, 7)}.json`;
   }
 
   /**
@@ -130,10 +157,10 @@ export default class DateTask {
   }
 
   /**
-   * 集計する
+   * 集計データを取得する
    * @returns
    */
-  totalize(projects: Project[], { separator = '・', minuteStep = 30 }: { separator?: string; minuteStep?: MinuteStep } = {}) {
+  totalize(projects: Project[], { taskSeparator = '・', minuteStep = 30 }: { taskSeparator?: string; minuteStep?: MinuteStep } = {}) {
     let startAt: Time | null = null;
     let endAt: Time | null = null;
     let totalHours = 0;
@@ -152,7 +179,7 @@ export default class DateTask {
         tasks.forEach((task) => {
           minutes += task.minutes;
           if (task.body) {
-            task.body.split(separator).forEach((bodyItem) => {
+            task.body.split(taskSeparator).forEach((bodyItem) => {
               bodySet.add(bodyItem);
             });
           }
@@ -170,14 +197,16 @@ export default class DateTask {
         return {
           name: project.name,
           hours,
-          description: [...bodySet].join(separator),
+          description: [...bodySet].join(taskSeparator),
         };
       })
       .filter(Boolean);
 
     return {
+      year: this.getYear(),
       month: this.getMonth(),
       date: this.getDate(),
+      weekday: this.getWeekday(),
       startAt: `${startAt ?? '?:??'}`,
       endAt: `${endAt ?? '?:??'}`,
       projects: projectsTotal,

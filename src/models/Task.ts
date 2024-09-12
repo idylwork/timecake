@@ -3,7 +3,7 @@ import Time from './Time';
 
 export interface TaskData {
   body: string;
-  projectId?: string | null;
+  projectId?: string;
   startAt: Time;
   endAt: Time | null;
 }
@@ -15,13 +15,13 @@ export default class Task {
   /** タスク内容 */
   body: string;
   /** プロジェクト */
-  projectId: string | null;
+  projectId: string | undefined;
   /** 開始時間 */
   startAt: Time;
   /** 終了時間 */
   endAt: Time;
 
-  constructor({ body, projectId = null, startAt, endAt = null }: TaskData) {
+  constructor({ body, projectId = undefined, startAt, endAt = null }: TaskData) {
     this.body = body;
     this.projectId = projectId;
     this.startAt = startAt instanceof Time ? startAt : new Time(startAt);

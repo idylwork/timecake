@@ -1,11 +1,10 @@
 import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, Cross2Icon, PinBottomIcon } from '@radix-ui/react-icons';
-import { useAtom, useAtomValue } from 'jotai';
-import { dateTaskAtom, dateTaskLogsAtom, minuteStepAtom, outputTemplateAtom, projectsAtom, taskSeparatorAtom } from '../../atoms/dateTaskState';
+import { useAtom } from 'jotai';
+import { useMemo, useState } from 'react';
+import { dateTaskAtom, useFillDateTask, useGenerateDateTaskOutput } from '../../atoms/dateTaskAtom';
+import { useChangeDateTask } from '../../atoms/initializeAtom';
 import DateTask from '../../models/DateTask';
-import Task from '../../models/Task';
-import Time from '../../models/Time';
-import { floorNumberUnit } from '../../utils/number';
-import { replaceMustache } from '../../utils/string';
+import { dateToString, dateWithoutTime } from '../../utils/Date';
 import Button, { ButtonGroup } from '../Button';
 import styles from './index.module.css';
 
@@ -14,32 +13,32 @@ import styles from './index.module.css';
  * @returns
  */
 export default function ActionMenu() {
-  /** 日別タスクグループ */
+  /** 編集中日別タスクグループ */
   const [dateTask, setDateTask] = useAtom(dateTaskAtom);
-  /** プロジェクトリスト */
-  const projects = useAtomValue(projectsAtom);
-  /** 出力用テンプレート */
-  const outputTemplate = useAtomValue(outputTemplateAtom);
-  /** タスク区切り文字 */
-  const taskSeparator = useAtomValue(taskSeparatorAtom);
-  /** タスク時間単位 */
-  const minuteStep = useAtomValue(minuteStepAtom);
-  const [dateTaskLogs, setDateTaskLogs] = useAtom(dateTaskLogsAtom);
+  /** 日付の移動中か */
+  const [isMovingDate, setIsMovingDate] = useState(false);
+  /** 最後のタスクを現在時刻まで延長 */
+  const fillDateTask = useFillDateTask();
+  /** 日別タスクの出力用文字列取得 */
+  const createDateTaskOutput = useGenerateDateTaskOutput();
+  /** 編集する日付を変更 */
+  const changeDateTask = useChangeDateTask();
+  /** 編集中の日別タスクが本日日付か */
+  const isToday = useMemo(() => dateTask.date === dateToString(new Date()), [dateTask.date]);
 
   /**
-   * 日付を移動する
-   * @param diff - 移動する日数
+   * 日付を移動してファイルの読み書き
+   * @param diff - 移動する日数 (未指定で本日)
    */
-  const moveDate = (diff: number | undefined = undefined) => {
-    // 現在の日別タスクをログに書き込み
-    setDateTaskLogs(dateTask);
+  const changeDate = async (diff: number | undefined = undefined) => {
+    if (isMovingDate) return;
+    setIsMovingDate(true);
 
-    // ログから日別タスクを読み込み
-    const date = diff !== undefined ? new Date(dateTask.getYear(), dateTask.getMonth() - 1, dateTask.getDate() + diff) : new Date();
-    let newDateTask = new DateTask({ date: date, tasks: [] });
-    if (dateTask.date === newDateTask.date) return;
-    newDateTask = dateTaskLogs.get(newDateTask.date) ?? newDateTask;
-    setDateTask(newDateTask);
+    // 編集中日付のタスクをファイル保存して対象日付を新しく読み込み
+    const today = dateWithoutTime();
+    const newDate = diff !== undefined ? new Date(dateTask.getYear(), dateTask.getMonth() - 1, dateTask.getDate() + diff) : today;
+    await changeDateTask(newDate, dateTask);
+    setIsMovingDate(false);
   };
 
   /**
@@ -50,45 +49,21 @@ export default function ActionMenu() {
   };
 
   /**
-   * 最後のタスクを現在時刻まで延長する
+   * 出力用文字列を作成してクリップボードにコピー
    */
-  const fillCurrentTask = () => {
-    const newTasks = [...dateTask.tasks];
-    const [currentTask] = newTasks.splice(-1, 1);
-    if (!currentTask) return;
-
-    const now = new Time(floorNumberUnit(new Time().valueOf(), minuteStep));
-    if (currentTask.endAt >= now) return;
-
-    setDateTask(
-      new DateTask({
-        date: dateTask.date,
-        tasks: [...newTasks, new Task({ ...currentTask, endAt: now })],
-      })
-    );
-  };
-
-  /**
-   * クリップボードにコピー
-   */
-  const copyToClipboard = () => {
-    const total = dateTask.totalize(projects, {
-      separator: taskSeparator,
-      minuteStep: minuteStep,
-    });
-    const text = replaceMustache(outputTemplate, total);
-    console.info(text);
+  const copyToClipboard = async () => {
+    const text = await createDateTaskOutput(dateTask);
     navigator.clipboard.writeText(text);
   };
 
   return (
     <section className={styles.root} data-tauri-drag-region="default">
       <ButtonGroup>
-        <Button size="small" icon={<ChevronLeftIcon />} onClick={() => moveDate(-1)}></Button>
-        <Button size="small" onClick={() => moveDate()}>
+        <Button size="small" icon={<ChevronLeftIcon />} onClick={() => changeDate(-1)}></Button>
+        <Button size="small" complete="Jump!" onClick={() => changeDate()}>
           今日
         </Button>
-        <Button size="small" icon={<ChevronRightIcon />} onClick={() => moveDate(1)}></Button>
+        <Button size="small" icon={<ChevronRightIcon />} onClick={() => changeDate(1)}></Button>
       </ButtonGroup>
       <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>
         クリア
@@ -96,7 +71,7 @@ export default function ActionMenu() {
       <Button size="small" icon={<CopyIcon />} complete="Copied!" onClick={copyToClipboard}>
         コピー
       </Button>
-      <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillCurrentTask}>
+      <Button size="small" icon={<PinBottomIcon />} complete="Filled!" onClick={fillDateTask} disabled={!isToday}>
         延長
       </Button>
     </section>

@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "start": "tauri dev",
-    "build": "tsc && vite build",
+    "build": "tauri build",
+    "dev:vite": "vite",
+    "build:vite": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "format": "prettier --list-different --write src"

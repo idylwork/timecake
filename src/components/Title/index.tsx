@@ -1,18 +1,17 @@
 import { GearIcon } from '@radix-ui/react-icons';
+import classNames from 'classnames';
 import { useSetAtom } from 'jotai';
-import { ScreenMode, screenModeAtom } from '../../atoms/dateTaskState';
+import { ScreenMode, screenModeAtom } from '../../atoms/screenModeAtom';
 import styles from './index.module.css';
 
-interface Props {
-  children: React.ReactNode;
-}
+interface Props extends React.ComponentPropsWithoutRef<'div'> {}
 
 /**
  * アプリケーションのタイトル部分
  * @param props.children - タイトルに表示する内容
  * @returns
  */
-export default function Title({ children }: Props) {
+export default function Title({ className, children }: Props) {
   /** 画面表示モード */
   const setScreenMode = useSetAtom(screenModeAtom);
 
@@ -24,7 +23,7 @@ export default function Title({ children }: Props) {
   };
 
   return (
-    <div className={styles.root} data-tauri-drag-region="default">
+    <div className={classNames(styles.root, className)} data-tauri-drag-region="default">
       {children}
       <button type="button" className={styles.setting} onClick={toggleSettingScreen}>
         <GearIcon />

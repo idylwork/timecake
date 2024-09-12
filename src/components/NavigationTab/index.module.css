@@ -1,4 +1,5 @@
 .root {
+  flex-shrink: 0;
   display: flex;
   background: #22222240;
   border-radius: 0.2rem;

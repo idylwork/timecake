@@ -12,7 +12,7 @@ export interface ProjectData {
  */
 export default class Project {
   /** ID */
-  id?: string;
+  id: string;
   /** プロジェクト名 */
   name: string;
   /** プロジェクト固有色 */

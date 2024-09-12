@@ -1,10 +1,13 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { useEffect, useRef } from 'react';
-import { dateTaskAtom, minuteStepAtom, projectsAtom } from '../../atoms/dateTaskState';
+import { useLayoutEffect, useMemo, useRef } from 'react';
+import { dateTaskAtom } from '../../atoms/dateTaskAtom';
+import { minuteStepAtom } from '../../atoms/preferenceAtom';
+import { projectsAtom } from '../../atoms/projectsAtom';
 import { PIXEL_PER_MINUTE } from '../../constants';
 import DateTask from '../../models/DateTask';
 import Task from '../../models/Task';
 import Time from '../../models/Time';
+import { dateToString } from '../../utils/Date';
 import { floorNumberUnit } from '../../utils/number';
 import { TaskBlock } from '../TaskBlock';
 import TaskBlockListBackground from './background';
@@ -25,6 +28,8 @@ export default function TaskBlockList() {
   const minuteStep = useAtomValue(minuteStepAtom);
   /** コンポーネントルート要素の参照 */
   const rootRef = useRef<HTMLDivElement>(null);
+  /** 今日のタスクグループか */
+  const isToday = useMemo(() => dateTask.date === dateToString(new Date()), [dateTask.date]);
 
   /**
    * 日別タスクグループを更新
@@ -70,10 +75,11 @@ export default function TaskBlockList() {
    * @param event
    */
   const appendTask = (event: React.MouseEvent<HTMLElement>) => {
-    const layerY = event.nativeEvent.layerY - (rootRef.current ? rootRef.current.scrollTop - rootRef.current.scrollTop : 0);
+    const rect = event.currentTarget.getBoundingClientRect();
+    const layerY = event.pageY - rect.y - (rootRef.current ? rootRef.current.scrollTop - rootRef.current.scrollTop : 0);
     const startAt = new Time(floorNumberUnit(layerY / PIXEL_PER_MINUTE, minuteStep));
     const newTask = new Task({
-      projectId: projects[0].id,
+      projectId: projects instanceof Array ? projects[0]?.id : undefined,
       body: '',
       startAt: startAt,
       endAt: startAt.toAdded(Math.max(minuteStep, 60)),
@@ -89,22 +95,23 @@ export default function TaskBlockList() {
     setDateTask(new DateTask({ ...dateTask, tasks }));
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // 現在時刻周辺か最初のタスクまで自動スクロールする
     if (!rootRef.current) return;
-    rootRef.current.scrollTo({
-      top: (new Time().valueOf() - 120) * PIXEL_PER_MINUTE,
-    });
-  }, [rootRef.current]);
+
+    const top = isToday ? (new Time().valueOf() - 120) * PIXEL_PER_MINUTE : (dateTask.tasks[0]?.startAt.valueOf() ?? 600) * PIXEL_PER_MINUTE;
+    rootRef.current.scrollTo({ top });
+  }, [dateTask.date]);
 
   return (
     <section ref={rootRef} className={styles.root}>
       <div className={styles.container}>
         <div className={styles.foreground}>
           {dateTask.tasks.map((task, index) => (
-            <TaskBlock key={task.startAt.toString()} task={task} onChange={(newTask) => updateDateTask(index, newTask)} />
+            <TaskBlock key={`${dateTask.date}-${task.startAt}`} task={task} onChange={(newTask) => updateDateTask(index, newTask)} />
           ))}
         </div>
-        <TaskBlockListBackground onClick={appendTask} />
+        <TaskBlockListBackground date={dateTask.date} onClick={appendTask} />
       </div>
     </section>
   );

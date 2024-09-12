@@ -3,17 +3,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  line-height: 1em;
   background: #88888810;
   padding: 0 0.8rem;
   border-radius: 0.4rem;
   box-shadow: 0 3px 6px #00000020;
 }
 
-.root:hover {
+.root:hover:not(:disabled) {
   animation: hover-animation 1s;
 }
-.root:active {
+.root:active:not(:disabled) {
   opacity: 0.6;
+}
+.root:disabled {
+  color: var(--muted-color);
+  cursor: not-allowed;
 }
 
 @keyframes hover-animation {
@@ -39,6 +44,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 0.8em;
   font-weight: 500;
   color: #ffffff;
   background: #0fb665;
@@ -56,7 +62,7 @@
   font-size: 0.7rem;
 }
 .middle {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 .large {
   font-size: 1.2rem;
@@ -67,6 +73,15 @@
   display: flex;
   box-shadow: 0 3px 6px #00000020;
   border-radius: 0.4rem;
+}
+
+.group :not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.group :not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .group > .root {
@@ -95,4 +110,15 @@
 
 .group > .root .complete {
   border-radius: 0;
+}
+
+@media screen and (max-width: 320px) {
+  .small {
+    font-size: 0.6rem;
+    padding: 0 0.2rem;
+  }
+
+  .small > .icon {
+    width: 0.5rem;
+  }
 }

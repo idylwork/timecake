@@ -13,3 +13,18 @@
 .foregraound {
   width: 100%;
 }
+
+.enterActive {
+  opacity: 0.4;
+  transition: opacity 1s;
+}
+.enterDone {
+  opacity: 1;
+}
+.exitActive {
+  opacity: 1;
+  transition: opacity 1s;
+}
+.exitDone {
+  opacity: 1;
+}

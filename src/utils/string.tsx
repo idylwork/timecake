@@ -6,8 +6,15 @@ type MustacheData = {
  * データに基づいてMustache記法のプレースホルダを置換する
  *
  * @param template
- * @param data
+ * @param data 置換用データ (オブジェクト配列はループ構文で展開する)
  * @returns 置換された文字列
+ * @example
+ * ```
+ * replaceMustache('{{ title }}: {{ #items }}{{ name }}{{ /items}}', {
+ *   title: 'Example Title',
+ *   items: [{ name: 'Item 1' }, { name: 'Item 2' }],
+ * })
+ * ```
  */
 export const replaceMustache = (template: string, data: MustacheData): string => {
   let text = template;
@@ -20,7 +27,8 @@ export const replaceMustache = (template: string, data: MustacheData): string =>
    */
   const replaceMustacheVars = (text: string, data: MustacheData): string => {
     return text.replace(/\{\{ ?([a-zA-Z]+) ?\}\}/g, (_, attribute) => {
-      return data ? `${data[attribute]}` ?? '' : '';
+      const value = data[attribute] ?? '';
+      return value instanceof Array ? JSON.stringify(value) : `${value}`;
     });
   };
 
@@ -42,4 +50,17 @@ export const replaceMustache = (template: string, data: MustacheData): string =>
     });
   }
   return replaceMustacheVars(text, data);
+};
+
+/**
+ * JSON文字列をパースする
+ * @param json
+ * @returns JSONをパースした値。。パース失敗時はundefined
+ */
+export const parseJSON = <T,>(json: string): T | undefined => {
+  try {
+    return JSON.parse(json);
+  } catch (error) {
+    console.error(error);
+  }
 };

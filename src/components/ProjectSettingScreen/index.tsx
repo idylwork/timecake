@@ -1,7 +1,8 @@
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useSetAtom } from 'jotai';
-import { ScreenMode, screenModeAtom } from '../../atoms/dateTaskState';
+import { ScreenMode, screenModeAtom } from '../../atoms/screenModeAtom';
 import Button from '../Button';
+import Form from '../Form';
 import NavigationTab from '../NavigationTab';
 import ProjectList from '../ProjectList';
 import ScreenLayout, { ScreenActions } from '../ScreenLayout';
@@ -25,7 +26,9 @@ export default function ProjectSettingScreen() {
         selection={ScreenMode.projectSetting}
         onChange={(screenMode) => setScreenMode(screenMode)}
       />
-      <ProjectList />
+      <Form>
+        <ProjectList />
+      </Form>
       <ScreenActions>
         <Button size="large" className={styles.ok} icon={<CheckIcon />} onClick={() => setScreenMode(ScreenMode.taskEditor)}>
           OK

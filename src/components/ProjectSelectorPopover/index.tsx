@@ -1,7 +1,8 @@
 import classNames from 'classnames';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
-import { ScreenMode, projectsAtom, screenModeAtom } from '../../atoms/dateTaskState';
+import { projectsAtom } from '../../atoms/projectsAtom';
+import { ScreenMode, screenModeAtom } from '../../atoms/screenModeAtom';
 import Project from '../../models/Project';
 import styles from './index.module.css';
 

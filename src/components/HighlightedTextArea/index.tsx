@@ -6,6 +6,7 @@ type Props = {
   value: string;
   setValue: (newValue: string) => void;
   className?: string;
+  maxLength?: number;
 };
 
 /** 検索モード */
@@ -36,7 +37,7 @@ type HighlightDelta = {
  * @returns
  */
 export default React.memo(
-  React.forwardRef<HTMLTextAreaElement, Props>(({ value, setValue, className = '' }, ref) => {
+  React.forwardRef<HTMLTextAreaElement, Props>(({ value, setValue, className = '', maxLength }, ref) => {
     /** ハイライト要素の参照 */
     const highlightRef = useRef<HTMLDivElement>(null);
     /** @var テキストエリア要素の高さ */
@@ -115,7 +116,15 @@ export default React.memo(
 
     return (
       <div className={classNames(styles.root, className)}>
-        <textarea ref={ref} className={styles.textarea} style={{ height: `${textAreaHeight}px` }} value={value} autoCapitalize="off" onChange={handleChange} />
+        <textarea
+          ref={ref}
+          className={styles.textarea}
+          style={{ height: `${textAreaHeight}px` }}
+          value={value}
+          autoCapitalize="off"
+          onChange={handleChange}
+          maxLength={maxLength}
+        />
         <div ref={highlightRef} className={styles.highlight}>
           {highlightDeltas.map((delta, index) => (
             <EditorTextDelta type={delta.type} text={delta.text} key={index} />

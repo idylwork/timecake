@@ -23,16 +23,15 @@ export default class Time {
    * コンストラクタ
    * @param timeOrMinutes - 分、または時刻文字列
    */
-  constructor(timeOrMinutes: string | number | { hour: number; minute: number } | null = null) {
+  constructor(timeOrMinutes: string | number | { hour: number; minute: number } | Date = new Date()) {
     let minutes = 0;
     if (typeof timeOrMinutes === 'string') {
       const chunks = (timeOrMinutes as string).split(':');
       minutes = Number(chunks[0]) * 60 + Number(chunks[1] ?? '0');
     } else if (typeof timeOrMinutes === 'number') {
       minutes = timeOrMinutes;
-    } else if (timeOrMinutes === null) {
-      const now = new Date();
-      minutes = now.getHours() * 60 + now.getMinutes();
+    } else if (timeOrMinutes instanceof Date) {
+      minutes = timeOrMinutes.getHours() * 60 + timeOrMinutes.getMinutes();
     } else {
       minutes = timeOrMinutes.hour * 60 + timeOrMinutes.minute;
     }
