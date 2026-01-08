@@ -13,8 +13,11 @@ export const DEFAULT_OUTPUT_TEMPLATE =
   '＜コメント＞\n' +
   '```\n';
 /** タスク区切り文字 */
+/** 出力用テンプレート */
+export const DEFAULT_MONTHLY_OUTPUT_TEMPLATE =
+  '{{year}}/{{month}}\n' + '{{#projects}}\n' + '{{month}}/{{date}}\t{{name}}\t{{description}}\t{{hours}}h\n' + '{{/projects}}\n';
 export const DEFAULT_TASK_SEPARATOR = '・';
 /** タスク時間単位 */
 export const DEFAULT_MINUTE_STEP = 30;
 /** 現在時刻を更新する間隔 (秒) */
-export const REFRESH_INTERVAL = 180
+export const REFRESH_INTERVAL = 180;

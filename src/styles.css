@@ -3,6 +3,7 @@
   --secondary-color: #dddddd60;
   --muted-color: #0f0f0f44;
   --background-color: #ffffff;
+  --accent-color: #ff0000;
 
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -17,6 +18,26 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+:not(input, textarea) {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 0.8rem;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-color);
+  border-radius: 0.4rem;
+  border-right: 0.3rem solid transparent;
+  border-left: 0.3rem solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,6 +65,7 @@
 body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
 }
 img,
 picture,

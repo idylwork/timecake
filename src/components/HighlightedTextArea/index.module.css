@@ -1,7 +1,7 @@
 .root {
   position: relative;
   height: 200px;
-  overflow: scroll;
+  overflow-y: scroll;
   font-size: 0.8rem;
   line-height: 1.4em;
 

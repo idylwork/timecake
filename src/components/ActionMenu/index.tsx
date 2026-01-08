@@ -1,8 +1,9 @@
 import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, Cross2Icon, PinBottomIcon } from '@radix-ui/react-icons';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useMemo, useState } from 'react';
 import { dateTaskAtom, useFillDateTask, useGenerateDateTaskOutput } from '../../atoms/dateTaskAtom';
 import { useChangeDateTask } from '../../atoms/initializeAtom';
+import { ScreenMode, screenModeAtom } from '../../atoms/screenModeAtom';
 import DateTask from '../../models/DateTask';
 import { dateToString, dateWithoutTime } from '../../utils/Date';
 import Button, { ButtonGroup } from '../Button';
@@ -15,12 +16,14 @@ import styles from './index.module.css';
 export default function ActionMenu() {
   /** 編集中日別タスクグループ */
   const [dateTask, setDateTask] = useAtom(dateTaskAtom);
+  /** 画面表示モード */
+  const setScreenMode = useSetAtom(screenModeAtom);
   /** 日付の移動中か */
   const [isMovingDate, setIsMovingDate] = useState(false);
   /** 最後のタスクを現在時刻まで延長 */
   const fillDateTask = useFillDateTask();
   /** 日別タスクの出力用文字列取得 */
-  const createDateTaskOutput = useGenerateDateTaskOutput();
+  const generateDateTaskOutput = useGenerateDateTaskOutput();
   /** 編集する日付を変更 */
   const changeDateTask = useChangeDateTask();
   /** 編集中の日別タスクが本日日付か */
@@ -52,8 +55,17 @@ export default function ActionMenu() {
    * 出力用文字列を作成してクリップボードにコピー
    */
   const copyToClipboard = async () => {
-    const text = await createDateTaskOutput(dateTask);
+    const text = await generateDateTaskOutput();
     navigator.clipboard.writeText(text);
+  };
+
+  /**
+   * 変更を保存してからカレンダー表示に変更する
+   * (ロックがかからないため、読み込みが優先される)
+   */
+  const handleChangeScreenMode = async () => {
+    await changeDateTask(undefined, dateTask);
+    setScreenMode(ScreenMode.taskMonth);
   };
 
   return (
@@ -64,6 +76,14 @@ export default function ActionMenu() {
           今日
         </Button>
         <Button size="small" icon={<ChevronRightIcon />} onClick={() => changeDate(1)}></Button>
+      </ButtonGroup>
+      <ButtonGroup>
+        <Button size="small" onClick={handleChangeScreenMode}>
+          月
+        </Button>
+        <Button size="small" disabled>
+          日
+        </Button>
       </ButtonGroup>
       <Button size="small" icon={<Cross2Icon />} complete="Done!" onClick={removeAllTasks}>
         クリア

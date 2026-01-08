@@ -8,13 +8,14 @@ import styles from './index.module.css';
 
 interface Props {
   open: boolean;
-  onChange: (project: Project | null) => void;
+  className?: string;
+  onChange: (project: Project | undefined) => void;
 }
 
 /**
  * プロジェクトを選択するポップオーバー
  */
-export default function ProjectSelectorPopover({ open, onChange }: Props) {
+export default function ProjectSelectorPopover({ open, className, onChange }: Props) {
   /** プロジェクトリスト */
   const projects = useAtomValue(projectsAtom);
   /** 画面表示モード */
@@ -27,9 +28,10 @@ export default function ProjectSelectorPopover({ open, onChange }: Props) {
    * @param event
    */
   const handleProjectClick = (event: React.MouseEvent<HTMLElement>) => {
-    const newProjectIndex = Number(event.currentTarget.dataset.projectIndex ?? -1);
-    if (newProjectIndex < 0) return;
-    onChange(projects[newProjectIndex]);
+    const newProjectId = event.currentTarget.dataset.projectId ?? '';
+    const newProject = projects.find((project) => project.id === newProjectId);
+    if (!newProject) return;
+    onChange(newProject);
   };
 
   /**
@@ -47,21 +49,21 @@ export default function ProjectSelectorPopover({ open, onChange }: Props) {
      * ダイアログを閉じる
      */
     const close = () => {
-      onChange(null);
+      onChange(undefined);
     };
 
     window.addEventListener('click', close, { capture: true });
     return () => {
-      window.removeEventListener('click', close);
+      window.removeEventListener('click', close, { capture: true });
     };
   }, [open]);
 
   return (
-    <div className={styles.root}>
+    <div className={classNames(styles.root, className)}>
       <dialog open={open} className={classNames(styles.dialog)}>
         <div className={styles.list}>
-          {availableProjects.map((project, index) => (
-            <button type="button" className={styles.listItem} data-project-index={index} onClick={handleProjectClick} key={project.id}>
+          {availableProjects.map((project) => (
+            <button type="button" className={styles.listItem} data-project-id={project.id} onClick={handleProjectClick} key={project.id}>
               <div className={styles.badge} style={{ backgroundColor: project.color.toString() }}></div>
               {project.name}
             </button>

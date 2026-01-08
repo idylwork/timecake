@@ -1,13 +1,15 @@
 import { atom } from 'jotai';
+import { Getter, Setter } from 'jotai/experimental';
 import { atomWithStorage, useAtomCallback } from 'jotai/utils';
 import { useCallback } from 'react';
 import DateTask, { DateTaskData } from '../models/DateTask';
+import MonthTotal from '../models/MonthTotal';
 import Task from '../models/Task';
 import Time from '../models/Time';
 import { readJSONFile, writeJSONFile } from '../utils/file';
 import { floorNumberUnit } from '../utils/number';
 import { parseJSON, replaceMustache } from '../utils/string';
-import { minuteStepAtom, outputTemplateAtom, storagePathAtom, taskSeparatorAtom } from './preferenceAtom';
+import { minuteStepAtom, monthlyOutputTemplateAtom, outputTemplateAtom, storagePathAtom, taskSeparatorAtom } from './preferenceAtom';
 import { projectsAtom } from './projectsAtom';
 
 /**
@@ -36,10 +38,14 @@ export const dateTaskAtom = atom(
     return new DateTask(data);
   },
   (_, set, update: DateTask) => {
-    set(isDateTaskChangedAtom, true)
-    set(dateTaskStorageAtom, update)
+    set(dateTaskStorageAtom, update);
   }
 );
+
+/**
+ * 日別タスク読み込みステータスAtom
+ */
+export const isDateTaskLoadingAtom = atom(true);
 
 /**
  * 編集中日別タスク変更ステータスAtom
@@ -118,38 +124,47 @@ const writeDateTask = async (path: string, dateTask: DateTask): Promise<DateTask
 };
 
 /** 日別タスクファイルの更新アクションプロパティ */
-interface DateTaskFileAction {
-  write?: DateTask;
-  read: DateTask;
-}
+type DateTaskFileAction =
+  | {
+      write?: DateTask;
+      read: DateTask | Date;
+    }
+  | {
+      write: DateTask;
+      read?: DateTask | Date;
+    };
 
 /**
  * 日別タスクファイルの読み込みと書き込みを行う
  * 対象ファイル名はDateTimeインスタンスの日付から自動的に判別する
+ * action.read か action.write どちらかは必須
  * @param get
  * @param set
  * @param action.write - ファイル書き込みするDateTaskインスタンス
- * @param action.read - 戻り値として返す日付のDateTaskインスタンス (日付のみ設定した空のDateTaskを想定)
+ * @param action.read - 戻り値として返す日付のDateTaskインスタンス (日付のみの指定も可能)
  * @returns action.readと同日のDateTaskを返す。(見つからなかった場合は引数の値をそのまま返す)
  */
 export const useProcessDateTaskFile = () =>
   useAtomCallback(
-    useCallback(async (get, _, action: DateTaskFileAction) => {
+    useCallback(async (get, _, action: DateTaskFileAction): Promise<DateTask> => {
       const storagePath = get(storagePathAtom);
 
-      // 日別タスクをファイル書き込み
+      // action.write が指定されている場合は日別タスクをファイル書き込み
       let updatedDateTasks: DateTask[] | undefined;
       if (action.write) {
         updatedDateTasks = await writeDateTask(action.write.getLogFileName(storagePath), action.write);
       }
 
-      /** 対象月の日別タスクリスト (書き込みと同月の場合はファイル読み込みを省略) */
-      const dateTasks =
-        updatedDateTasks && action.read.getLogFileName() === action.write?.getLogFileName()
-          ? updatedDateTasks
-          : await readDateTasks(action.read.getLogFileName(storagePath));
-
-      return dateTasks?.find((data) => data.date === action.read.date) ?? action.read;
+      // action.read が指定されている場合は日別タスクをファイル読み込み (action.writeと同月の場合はファイル読み込みを省略)
+      if (action.read) {
+        const read = action.read instanceof DateTask ? action.read : new DateTask({ date: action.read });
+        const dateTasks =
+          updatedDateTasks && read.getLogFileName() === action.write?.getLogFileName()
+            ? updatedDateTasks
+            : await readDateTasks(read.getLogFileName(storagePath));
+        return dateTasks?.find((data) => data.date === read.date) ?? read;
+      }
+      return action.write!;
     }, [])
   );
 
@@ -184,19 +199,83 @@ export const useFillDateTask = () =>
 
 /**
  * 設定値を反映して出力用文字列を取得
- * @param get
- * @param dateTask
  * @returns 出力用文字列
  */
 export const useGenerateDateTaskOutput = () =>
   useAtomCallback(
-    useCallback(async (get, _, dateTask: DateTask) => {
+    useCallback(async (get) => {
+      const dateTask = get(dateTaskAtom);
       const projects = await get(projectsAtom);
       const taskSeparator = get(taskSeparatorAtom);
-      const minuteStep = get(minuteStepAtom);
       const outputTemplate = get(outputTemplateAtom);
 
-      const totalData = dateTask.totalize(projects, { taskSeparator, minuteStep });
+      const totalData = dateTask.totalize({ projects, taskSeparator });
       return replaceMustache(outputTemplate, totalData);
+    }, [])
+  );
+
+/**
+ * 設定値を反映して月別タスクの出力用文字列を取得
+ * @param date - 年月を取得するためのDateオブジェクト
+ * @returns 出力用文字列
+ */
+export const useGenerateMonthTaskOutput = () =>
+  useAtomCallback(
+    useCallback(async (get, _, date: Date) => {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const projects = get(projectsAtom);
+      const taskSeparator = get(taskSeparatorAtom);
+      const outputTemplate = get(monthlyOutputTemplateAtom);
+      const storagePath = get(storagePathAtom);
+
+      // 月のデータを取得
+      const targetDateTask = new DateTask({ date: new Date(year, month - 1) });
+      const dateTasksData = await readJSONFile(`${storagePath}/${targetDateTask.getLogFileName()}`);
+      const dateTasks: DateTask[] = dateTasksData instanceof Array ? dateTasksData.map((datum) => new DateTask(datum)) : [];
+
+      // MonthTotalを作成して集計データを取得
+      const monthTotal = new MonthTotal({ year, month, dateTasks });
+
+      // 月内全ての日付のプロジェクトデータをフラットなリストに展開
+      const projectsList = dateTasks.flatMap((dateTask) => {
+        const totalData = dateTask.totalize({ projects, taskSeparator });
+        return totalData.projects.map((project) => ({
+          ...project,
+          date: totalData.date,
+          weekday: totalData.weekday,
+        }));
+      });
+
+      // 月全体の合計時間（時間単位）
+      const totalHours = monthTotal.total / 60;
+
+      const totalData = {
+        year: monthTotal.year,
+        month: monthTotal.month,
+        projects: projectsList,
+        total: totalHours,
+      };
+
+      return replaceMustache(outputTemplate, totalData);
+    }, [])
+  );
+
+/**
+ * 1月分の日別統計データリストを取得する
+ * @param props.year - 年
+ * @param props.month - 月
+ * @returns
+ */
+export const useFetchMonthTasks = () =>
+  useAtomCallback(
+    useCallback(async (get: Getter, _: Setter, year: number, month: number) => {
+      const storagePath = get(storagePathAtom);
+
+      const targetDateTask = new DateTask({ date: new Date(year, month - 1) });
+      const data = await readJSONFile(`${storagePath}/${targetDateTask.getLogFileName()}`);
+      if (!(data instanceof Array)) return new MonthTotal({ year, month, dateTasks: [] });
+
+      return new MonthTotal({ year, month, dateTasks: data.map((datum) => new DateTask(datum)) });
     }, [])
   );

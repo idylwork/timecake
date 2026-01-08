@@ -1,7 +1,7 @@
 .root {
   flex-grow: 1;
   padding: 1rem 1rem;
-  overflow: scroll;
+  overflow-y: scroll;
   overscroll-behavior: contain;
 }
 

@@ -1,6 +1,7 @@
 import { MinuteStep } from '../atoms/preferenceAtom';
 import { dateToString } from '../utils/Date';
 import { floorNumberUnit } from '../utils/number';
+import { MustacheData } from '../utils/string';
 import Project from './Project';
 import Task, { TaskData as TaskProps } from './Task';
 import Time from './Time';
@@ -8,6 +9,18 @@ import Time from './Time';
 export interface DateTaskData {
   date: string | Date;
   tasks?: Task[] | TaskProps[];
+}
+
+/** 日別タスクの集計データ */
+export interface DateTotal extends MustacheData {
+  year: number;
+  month: number;
+  date: number;
+  weekday: string;
+  startAt: string;
+  endAt: string;
+  projects: { id: string; name: string; hours: number; description: string }[];
+  total: number;
 }
 
 /**
@@ -18,10 +31,20 @@ export default class DateTask {
   date: string;
   /** タスクリスト */
   tasks: Task[];
-  /** 日付 */
+  /** 日付 (月初のDate型) */
   #date: Date;
 
-  constructor({ date = new Date(), tasks = [] }: DateTaskData) {
+  /**
+   * 日付文字列からログファイル名を作成
+   * @param dateOrYear - 年もしくは文字列
+   * @param month - 月
+   * @returns
+   */
+  static logFileName(dateOrYear: string | number, month?: number) {
+    return month ? `${dateOrYear}-${month.toString().padStart(2, '0')}` : `${dateOrYear.toString().substring(0, 7)}.json`;
+  }
+
+  constructor({ date, tasks = [] }: DateTaskData) {
     // インスタンスとデータのどちらも受け取れるようにする
     this.date = date instanceof Date ? dateToString(date) : date;
     this.#date = date instanceof Date ? date : new Date(date);
@@ -103,7 +126,7 @@ export default class DateTask {
    * @returns
    */
   getLogFileName(dir = '') {
-    return `${dir}/${this.date.substring(0, 7)}.json`;
+    return `${dir}/${DateTask.logFileName(this.date)}`;
   }
 
   /**
@@ -121,17 +144,17 @@ export default class DateTask {
 
   /**
    * タスクをプロジェクトごとのグループにまとめる
-   * @returns プロジェクト毎のタスクリスト
+   * @returns プロジェクト毎のタスクリスト []
    */
   tasksByProject(): Task[][] {
     const tasksByProject = new Map<string, Task[]>([]);
     this.tasks.forEach((task) => {
-      const key = task.projectId ?? '';
-      const tasks = tasksByProject.get(key);
+      const projectId = task.projectId ?? '';
+      const tasks = tasksByProject.get(projectId);
       if (tasks) {
-        tasksByProject.set(key, [...tasks, task]);
+        tasksByProject.set(projectId, [...tasks, task]);
       } else {
-        tasksByProject.set(key, [task]);
+        tasksByProject.set(projectId, [task]);
       }
     });
     return [...tasksByProject.values()];
@@ -160,7 +183,11 @@ export default class DateTask {
    * 集計データを取得する
    * @returns
    */
-  totalize(projects: Project[], { taskSeparator = '・', minuteStep = 30 }: { taskSeparator?: string; minuteStep?: MinuteStep } = {}) {
+  totalize({
+    projects = [],
+    taskSeparator = '・',
+    minuteStep = 30,
+  }: { projects?: Project[]; taskSeparator?: string; minuteStep?: MinuteStep } = {}): DateTotal {
     let startAt: Time | null = null;
     let endAt: Time | null = null;
     let totalHours = 0;
@@ -191,10 +218,11 @@ export default class DateTask {
           }
         });
 
-        const hours = floorNumberUnit(minutes, minuteStep) / 60;
+        const hours = minuteStep ? floorNumberUnit(minutes, minuteStep) / 60 : minutes / 60;
         totalHours += hours;
 
         return {
+          id: project.id,
           name: project.name,
           hours,
           description: [...bodySet].join(taskSeparator),
@@ -210,6 +238,7 @@ export default class DateTask {
       startAt: `${startAt ?? '?:??'}`,
       endAt: `${endAt ?? '?:??'}`,
       projects: projectsTotal,
+      total: totalHours,
     };
   }
 }

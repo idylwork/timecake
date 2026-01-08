@@ -10,7 +10,7 @@ export default class Color {
   /** 彩度 */
   #saturation: number | null = null;
 
-  constructor(colorOrRed: Color | number | string, green: number | null = null, blue: number | null = null) {
+  constructor(colorOrRed: Color | number | string = '000000', green: number | null = null, blue: number | null = null) {
     if (typeof colorOrRed === 'object') {
       this.red = colorOrRed.red;
       this.green = colorOrRed.green;

@@ -7,7 +7,7 @@ import DateTask from '../models/DateTask';
 import { dateWithoutTime } from '../utils/Date';
 import { makeDir } from '../utils/file';
 import { appendAutoCompleteLog, autoCompleteLogAtom, useReadAutoCompleteLog } from './autoCompleteLogAtom';
-import { dateTaskAtom, isDateTaskChangedAtom, useProcessDateTaskFile } from './dateTaskAtom';
+import { dateTaskAtom, isDateTaskChangedAtom, isDateTaskLoadingAtom, useProcessDateTaskFile } from './dateTaskAtom';
 import { storagePathAtom, taskSeparatorAtom } from './preferenceAtom';
 import { useReadProjectsFile } from './projectsAtom';
 
@@ -39,6 +39,8 @@ export const useInitializeAtoms = () => {
 
       // オートコンプリートログをファイルから読み込み
       await readAutoCompleteLog();
+
+      set(isDateTaskLoadingAtom, false);
     }, [])
   );
 };
@@ -54,30 +56,50 @@ export const useChangeDateTask = () => {
   /** オートコンプリート情報をファイル読み込み */
   const readAutoCompleteLog = useReadAutoCompleteLog();
 
+  /**
+   * 日付を移動する
+   * 編集中のタスクと付帯する情報を保存し、対象日付のデータを読み込む
+   * @param date - 読み込みする日付 (省略時は読み込みしない)
+   * @param prevDateTask - 書き込みする日付 (省略時は書き込みしない)
+   * @returns
+   */
   return useAtomCallback(
-    useCallback(async (get: Getter, set: Setter, date: Date, prevDateTask: DateTask) => {
+    useCallback(async (get: Getter, set: Setter, readDate?: DateTask | Date, writeDateTask?: DateTask | undefined) => {
       // 編集中の日別タスクを保存して対象日付を読み込み
-      const newDateTask = await processDateTaskFile({ write: prevDateTask, read: new DateTask({ date }) });
+      set(isDateTaskLoadingAtom, true);
+      let newDateTask;
+      if (readDate) {
+        // 読み書き・読み込みのみ
+        newDateTask = await processDateTaskFile({ write: writeDateTask, read: readDate });
+      } else if (writeDateTask) {
+        // 書き込みのみ
+        newDateTask = await processDateTaskFile({ write: writeDateTask });
+      } else {
+        set(isDateTaskLoadingAtom, false);
+        return;
+      }
       set(dateTaskAtom, newDateTask);
       set(isDateTaskChangedAtom, false);
+      set(isDateTaskLoadingAtom, false);
 
-      // プロジェクトを使用順で並べ替え
-      let projectIds: string[] = [];
-      for (var i = prevDateTask.tasks.length - 1; i >= 0; i -= 1) {
-        const task = prevDateTask.tasks[i];
-        if (task.projectId) projectIds.push(task.projectId);
-      }
+      if (writeDateTask) {
+        // プロジェクトを使用順で並べ替え
+        let projectIds: string[] = [];
+        for (var i = writeDateTask.tasks.length - 1; i >= 0; i -= 1) {
+          const task = writeDateTask.tasks[i];
+          if (task.projectId) projectIds.push(task.projectId);
+        }
 
-      const currentDate = dateWithoutTime();
-      const autoCompleteLog = get(autoCompleteLogAtom);
-
-      const taskSeparator = get(taskSeparatorAtom);
-      if (currentDate.getTime() !== autoCompleteLog.date.getTime()) {
-        // 日付が変わっていたらオートコンプリートログをプロジェクトファイルを読み込み直す
-        await readAutoCompleteLog();
-      } else {
-        // すでに読み込んでいる場合はメモリ上のデータを追加するのみ
-        set(autoCompleteLogAtom, appendAutoCompleteLog(autoCompleteLog, prevDateTask, { taskSeparator }));
+        const currentDate = dateWithoutTime();
+        const autoCompleteLog = get(autoCompleteLogAtom);
+        const taskSeparator = get(taskSeparatorAtom);
+        if (currentDate.getTime() !== autoCompleteLog.date.getTime()) {
+          // 日付が変わっていたらオートコンプリートログをプロジェクトファイルを読み込み直す
+          await readAutoCompleteLog();
+        } else {
+          // すでに読み込んでいる場合はメモリ上のデータを追加するのみ
+          set(autoCompleteLogAtom, appendAutoCompleteLog(autoCompleteLog, writeDateTask, { taskSeparator }));
+        }
       }
     }, [])
   );

@@ -9,8 +9,9 @@ export const dateWithoutTime = (date: Date = new Date()) => {
 /**
  * 日付を文字列に変換する
  * @param date
+ * @param options - 日付フォーマットのオプション
  * @returns YYYY-MM-DD形式
  */
-export const dateToString = (date: Date) => {
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+export const dateToString = (date: Date, options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' }) => {
+  return date.toLocaleDateString('ja-JP', options).replaceAll('/', '-');
 };

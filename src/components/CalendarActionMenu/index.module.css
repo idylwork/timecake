@@ -1,0 +1,25 @@
+.root {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    width: 100%;
+    padding-bottom: 0.5rem;
+    border-bottom: 0.9px solid var(--muted-color);
+}
+
+.project {
+    position: relative;
+}
+
+.projectButton {
+    height: 100%;
+    &.selected {
+        background: var(--text-color);
+        color: var(--background-color);
+    }
+}
+
+.projectPopover {
+    position: absolute;
+    top: 100%;
+}

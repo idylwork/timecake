@@ -4,7 +4,9 @@ import { atom } from 'jotai';
  * 表示モード
  */
 export const ScreenMode = {
-  taskEditor: 'task',
+  taskEditor: 'taskEditor',
+  taskMonth: 'taskMonth',
+  taskYear: 'taskYear',
   projectSetting: 'projectSetting',
   preference: 'preference',
 } as const;

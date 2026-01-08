@@ -1,0 +1,41 @@
+.root {
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0.5rem 0;
+}
+
+.year {
+  .bar {
+    height: 1.8rem;
+    padding: 0.2rem 0.7rem;
+  }
+}
+
+.month {
+  .bar {
+    height: 1rem;
+    padding: 0.15rem 0.7rem;
+  }
+}
+
+.bar {
+  cursor: pointer;
+}
+.bar:hover {
+  background: #cccccc30;
+}
+
+.active {
+  font-weight: 900;
+  background: #cccccc30;
+}
+
+.current {
+  border-bottom: 0.5px solid var(--accent-color);
+  margin-bottom: 0.5px;
+}

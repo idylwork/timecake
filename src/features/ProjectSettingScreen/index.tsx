@@ -1,11 +1,11 @@
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useSetAtom } from 'jotai';
 import { ScreenMode, screenModeAtom } from '../../atoms/screenModeAtom';
-import Button from '../Button';
-import Form from '../Form';
-import NavigationTab from '../NavigationTab';
-import ProjectList from '../ProjectList';
-import ScreenLayout, { ScreenActions } from '../ScreenLayout';
+import Button from '../../components/Button';
+import Form from '../../components/Form';
+import NavigationTab from '../../components/NavigationTab';
+import ProjectList from '../../components/ProjectList';
+import ScreenLayout, { ScreenActions } from '../../components/ScreenLayout';
 import styles from './index.module.css';
 
 /**

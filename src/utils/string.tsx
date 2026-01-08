@@ -1,4 +1,4 @@
-type MustacheData = {
+export type MustacheData = {
   [key: string]: string | number | MustacheData[];
 };
 
@@ -44,7 +44,7 @@ export const replaceMustache = (template: string, data: MustacheData): string =>
 
       return childrenData
         .map((childData) => {
-          return replaceMustacheVars(content, childData);
+          return replaceMustacheVars(content, { ...data, ...childData });
         })
         .join('');
     });

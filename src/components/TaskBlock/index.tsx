@@ -28,7 +28,7 @@ export const TaskBlock = ({ task, onChange }: Props) => {
   /** プロジェクトリスト */
   const projects = useAtomValue(projectsAtom);
   /** タスク内容 */
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(task.body);
   /** 編集可能か */
   const [isEditable, setIsEditable] = useState(task.body === '');
   /** 内容のオートコンプリートを表示するか */
@@ -75,9 +75,9 @@ export const TaskBlock = ({ task, onChange }: Props) => {
 
   /**
    * プロジェクト選択を変更
-   * @param project - 選択されたプロジェクト (なにも選択されなかった場合はnull)
+   * @param project - 選択されたプロジェクト (なにも選択されなかった場合はundefined)
    */
-  const handleProjectChange = (project: Project | null) => {
+  const handleProjectChange = (project: Project | undefined) => {
     setIsProjectEditing(false);
     if (!project) return;
     onChange(new Task({ ...task, projectId: project.id }));

@@ -3,7 +3,7 @@ import { Getter } from 'jotai';
 import { Setter } from 'jotai/experimental';
 import { atomWithStorage, useAtomCallback } from 'jotai/utils';
 import { useCallback } from 'react';
-import { DEFAULT_MINUTE_STEP, DEFAULT_OUTPUT_TEMPLATE, DEFAULT_TASK_SEPARATOR } from '../constants';
+import { DEFAULT_MINUTE_STEP, DEFAULT_MONTHLY_OUTPUT_TEMPLATE, DEFAULT_OUTPUT_TEMPLATE, DEFAULT_TASK_SEPARATOR } from '../constants';
 import { moveFilesInDir } from '../utils/file';
 
 /**
@@ -12,9 +12,14 @@ import { moveFilesInDir } from '../utils/file';
 export const storagePathAtom = atomWithStorage('storagePath', '', undefined, { getOnInit: true });
 
 /**
- * 出力用テンプレートAtom
+ * 日別出力用テンプレートAtom
  */
 export const outputTemplateAtom = atomWithStorage('outputTemplate', DEFAULT_OUTPUT_TEMPLATE);
+
+/**
+ * 月別出力用テンプレートAtom
+ */
+export const monthlyOutputTemplateAtom = atomWithStorage('monthlyOutputTemplate', DEFAULT_MONTHLY_OUTPUT_TEMPLATE);
 
 /**
  * タスク区切り文字Atom
@@ -65,8 +70,10 @@ export const useMoveStoragePathWithFile = () =>
 export const useResetPreferences = () =>
   useAtomCallback(
     useCallback(async (get: Getter, set: Setter) => {
-      // 出力用テンプレート
+      // 日別出力用テンプレート
       set(outputTemplateAtom, DEFAULT_OUTPUT_TEMPLATE);
+      // 月別出力用テンプレート
+      set(monthlyOutputTemplateAtom, DEFAULT_MONTHLY_OUTPUT_TEMPLATE);
       // タスク区切り文字
       set(taskSeparatorAtom, DEFAULT_TASK_SEPARATOR);
       // タスク時間単位

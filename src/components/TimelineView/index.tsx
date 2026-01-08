@@ -19,7 +19,7 @@ import styles from './index.module.css';
  * @param props.setDateTask - 日別のタスクグループの更新
  * @returns
  */
-export default function TaskBlockList() {
+export default function TimelineView() {
   /** 日別タスクグループ */
   const [dateTask, setDateTask] = useAtom(dateTaskAtom);
   /** プロジェクトリスト */

@@ -8,10 +8,11 @@ import './App.module.css';
 import styles from './App.module.css';
 import { useInitializeAtoms } from './atoms/initializeAtom';
 import { ScreenMode, screenModeAtom } from './atoms/screenModeAtom';
-import PreferenceScreen from './components/PreferenceScreen';
-import ProjectSettingScreen from './components/ProjectSettingScreen';
-import SplashScreen from './components/SplashScreen';
-import TaskEditorScreen from './components/TaskEditorScreen';
+import PreferenceScreen from './features/PreferenceScreen';
+import ProjectSettingScreen from './features/ProjectSettingScreen';
+import SplashScreen from './features/SplashScreen';
+import TaskCalendarScreen from './features/TaskCalendarScreen';
+import TaskDayScreen from './features/TaskDayScreen';
 import useWindowFocused from './hooks/useWindowFocused';
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
   /** Atomの初期化が完了したか */
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // アプリ起動時に日別タスクと関連情報を読み込み
   useEffect(() => {
     (async () => {
       await initializeProjectsAtom();
@@ -45,7 +47,9 @@ export default function App() {
               <MinusIcon className={styles.controlIcon} />
             </button>
           </div>
-          {screenMode === ScreenMode.taskEditor && <TaskEditorScreen />}
+          {screenMode === ScreenMode.taskEditor && <TaskDayScreen />}
+          {screenMode === ScreenMode.taskMonth && <TaskCalendarScreen />}
+          {screenMode === ScreenMode.taskYear && <TaskCalendarScreen />}
           {screenMode === ScreenMode.projectSetting && <ProjectSettingScreen />}
           {screenMode === ScreenMode.preference && <PreferenceScreen />}
         </DndContext>

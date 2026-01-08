@@ -1,5 +1,6 @@
 interface Props {
   children: React.ReactNode;
+  className?: string;
 }
 
 /**
@@ -7,7 +8,7 @@ interface Props {
  * @param props.children -
  * @return
  */
-export default function Form({ children }: Props) {
+export default function Form({ children, className }: Props) {
   /**
    * フォーム送信操作時
    * @param event
@@ -20,5 +21,9 @@ export default function Form({ children }: Props) {
     }
   };
 
-  return <form onSubmit={handleSubmit}>{children}</form>;
+  return (
+    <form className={className} onSubmit={handleSubmit}>
+      {children}
+    </form>
+  );
 }

@@ -19,7 +19,10 @@ export default function Title({ className, children }: Props) {
    * 設定画面に切り替える
    */
   const toggleSettingScreen = () => {
-    setScreenMode((displayMode) => (displayMode === ScreenMode.taskEditor ? ScreenMode.preference : ScreenMode.taskEditor));
+    setScreenMode((screenMode) => {
+      const preferenceScreens = new Set<ScreenMode>([ScreenMode.preference, ScreenMode.projectSetting]);
+      return preferenceScreens.has(screenMode) ? ScreenMode.taskEditor : ScreenMode.preference;
+    });
   };
 
   return (

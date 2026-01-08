@@ -42,7 +42,7 @@ export default function Button({ icon = null, size = 'middle', complete = '', cl
   );
 }
 
-interface GroupProps {
+interface GroupProps extends React.ComponentPropsWithoutRef<'div'> {
   children: React.ReactNode;
 }
 
@@ -51,6 +51,6 @@ interface GroupProps {
  * @param props.children
  * @returns
  */
-export function ButtonGroup({ children }: GroupProps) {
-  return <div className={styles.group}>{children}</div>;
+export function ButtonGroup({ className, ...props }: GroupProps) {
+  return <div className={classNames(styles.group, className)} {...props} />;
 }

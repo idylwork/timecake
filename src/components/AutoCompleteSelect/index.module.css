@@ -12,6 +12,7 @@
   padding: 0.1rem 0.3rem;
   border-radius: 0.2rem;
   box-shadow: 0 3px 6px #00000020;
+  overflow: hidden;
 }
 
 .item {

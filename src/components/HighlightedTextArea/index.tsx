@@ -1,8 +1,9 @@
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './index.module.css';
 
 type Props = {
+  children?: React.ReactNode;
   value: string;
   setValue: (newValue: string) => void;
   className?: string;
@@ -30,94 +31,122 @@ type HighlightDelta = {
   text: string;
 };
 
+/** 文字列追加コールバックのコンテキスト */
+const InsertToHighlightedTextAreaContext = React.createContext<(text: string) => void>(() => {});
+/** テキストエリア要素を取得する */
+export const useInsertToHighlightedTextArea = () => React.useContext(InsertToHighlightedTextAreaContext);
+
 /**
  * 入力補助機能を備えたテキストエリア
  * @param value - 入力内容
  * @param setValue - 入力変更時の処理
  * @returns
  */
-export default React.memo(
-  React.forwardRef<HTMLTextAreaElement, Props>(({ value, setValue, className = '', maxLength }, ref) => {
-    /** ハイライト要素の参照 */
-    const highlightRef = useRef<HTMLDivElement>(null);
-    /** @var テキストエリア要素の高さ */
-    const [textAreaHeight, setTextAreaHeight] = useState(0);
+export default React.memo(({ children, value, setValue, className = '', maxLength }: Props) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  /** ハイライト要素の参照 */
+  const highlightRef = useRef<HTMLDivElement>(null);
+  /** テキストエリア要素の高さ */
+  const [textAreaHeight, setTextAreaHeight] = useState(0);
 
-    // テキストエリアの高さをシンタックスハイライトの高さと同期する
-    useEffect(() => {
-      setTimeout(() => {
-        setTextAreaHeight(highlightRef.current?.clientHeight ?? 0);
-      }, 0);
-    }, [value]);
+  // テキストエリアの高さをシンタックスハイライトの高さと同期する
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setTextAreaHeight(highlightRef.current?.clientHeight ?? 0);
+    });
+  }, [value]);
 
-    /**
-     * 文章入力時
-     * @param event
-     */
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setValue(event.currentTarget.value);
-    };
+  /**
+   * 文章入力時
+   * @param event
+   */
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(event.currentTarget.value);
+  };
 
-    /** ハイライト要素リスト */
-    const highlightDeltas = useMemo<HighlightDelta[]>(() => {
-      const deltas: HighlightDelta[] = [];
+  /**
+   * テキストエリアに文字列を追加
+   * @param input
+   * @param text
+   */
+  const insertText = useCallback(
+    (text: string) => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
 
-      const lines = value.split('\n');
-      let currentLine = -1;
+      const index = textarea.selectionEnd;
+      setValue(`${value.slice(0, index)}${text}${value.slice(index)}`);
 
-      while (currentLine + 1 < lines.length) {
-        currentLine += 1;
-        let line = lines[currentLine];
+      textarea.focus();
+      requestAnimationFrame(() => {
+        textarea.selectionStart = index;
+        textarea.selectionEnd = index + text.length;
+      });
+    },
+    [value]
+  );
 
-        while (true) {
-          let old = line;
-          line = line.replace(/^([\s\S]*?){{( ?[^\}]* ?)}}/, (_, prefix, attribute) => {
-            deltas.push({
-              type: HighlightType.Plain,
-              text: `${prefix}`,
-            });
+  /** ハイライト要素リスト */
+  const highlightDeltas = useMemo<HighlightDelta[]>(() => {
+    const deltas: HighlightDelta[] = [];
 
-            switch (attribute.at(0)) {
-              case '#':
-                deltas.push({
-                  type: HighlightType.SectionStart,
-                  text: attribute.substring(1),
-                });
-                break;
-              case '/':
-                deltas.push({
-                  type: HighlightType.SectionEnd,
-                  text: attribute.substring(1),
-                });
-                break;
-              default:
-                deltas.push({
-                  type: HighlightType.Variable,
-                  text: attribute,
-                });
-                break;
-            }
+    const lines = value.split('\n');
+    let currentLine = -1;
 
-            return '';
+    while (currentLine + 1 < lines.length) {
+      currentLine += 1;
+      let line = lines[currentLine];
+
+      while (true) {
+        let old = line;
+        line = line.replace(/^([\s\S]*?){{( ?[^\}]* ?)}}/, (_, prefix, attribute) => {
+          deltas.push({
+            type: HighlightType.Plain,
+            text: `${prefix}`,
           });
 
-          if (line === old) {
-            deltas.push({
-              type: HighlightType.Plain,
-              text: `${line}\n`,
-            });
-            break;
+          switch (attribute.at(0)) {
+            case '#':
+              deltas.push({
+                type: HighlightType.SectionStart,
+                text: attribute.substring(1),
+              });
+              break;
+            case '/':
+              deltas.push({
+                type: HighlightType.SectionEnd,
+                text: attribute.substring(1),
+              });
+              break;
+            default:
+              deltas.push({
+                type: HighlightType.Variable,
+                text: attribute,
+              });
+              break;
           }
+
+          return '';
+        });
+
+        if (line === old) {
+          deltas.push({
+            type: HighlightType.Plain,
+            text: `${line}\n`,
+          });
+          break;
         }
       }
+    }
 
-      return deltas;
-    }, [value]);
+    return deltas;
+  }, [value]);
 
-    return (
+  return (
+    <InsertToHighlightedTextAreaContext.Provider value={insertText}>
       <div className={classNames(styles.root, className)}>
         <textarea
-          ref={ref}
+          ref={textareaRef}
           className={styles.textarea}
           style={{ height: `${textAreaHeight}px` }}
           value={value}
@@ -131,9 +160,10 @@ export default React.memo(
           ))}
         </div>
       </div>
-    );
-  })
-);
+      {children}
+    </InsertToHighlightedTextAreaContext.Provider>
+  );
+});
 
 /**
  * 装飾されたテキスト
